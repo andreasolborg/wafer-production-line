@@ -21,4 +21,6 @@ The Simulator class would use the scheduler to simulate the production process b
     **Illegal flow:** We have a batch of 20 wafers. The unit use one minute to load all the wafers into the machine. The unit use 10*0.5=5 minutes to perform the task on the first half of the wafers. Then the unit uses 1 minute to unload the first half. The unit uses 5 minutes to perform the task on the second half of the wafers. Then it uses 1 minutes to unload the second half. Total of 13 minutes on machine 1.
 
 2. The problem with this task is that when a batch is finished its not garanteed that the input buffer on the next machine hase enough place to store the batch. The task states that batches must be unloaded from units as soon as they are processed. If the batch is to big to be placed in the next input buffer then everything stops because our simulation is in a illegal state? Or it is simply blocked until it is space in the input buffer.
+3. What is a "machine" compared to a unit and buffer?
+4. 
 
