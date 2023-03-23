@@ -7,6 +7,7 @@ class Task:
     A task can perform only one batch at a time.
     Each task has a different processing time.
     The last task in the unit has output buffer with unlimited capacity.
+    
     ********************************************************************
     |Task                1    2     3    4    5     6    7    8     9   |
     |------------------------------------------------------------------ |
@@ -46,7 +47,7 @@ class Task:
     
     def getBatchInTask(self):
         return self.batchInTask
-    
+        
     def setBatchInTask(self, batch):
         # check if task is already processing a batch, and if the batch is not None
         if self.getIsProcessing() == True and batch != None:
@@ -64,6 +65,7 @@ class Task:
     # if batch has been in task for the processing time, set isFinished to True. Then the batch can be unloaded from the unit, and sent to the next task
     def incrementTick(self, tick: float):
         self.tick += tick
+        
         print(f"Task {self.getTaskNumber()} has tick {self.getTick()}.")
         if self.getIsProcessing() == False:
             # check if the task has a batch in it, and if the input buffer has a batch in it
@@ -121,7 +123,7 @@ def main():
     #     print(task)
 
     # make a batch of size 20
-    batch = Batch(20)
+    batch = Batch(30)
 
     task1 = Task(1)
     print("Æ")

@@ -29,7 +29,7 @@ The Simulator class would use the scheduler to simulate the production process b
 4. Skal vi validere input i denne øvingen?
 5. Hvorfor har vi ikke en input buffer for task 1?
 6. addBatchToBuffer-funksjonen, vi burde sjekke om det er plass før vi adder til buffer
+    - Andy: Antar at en full buffer ødelegger prosessen. Er litt usikker
 8. Procesing time burde være en attribute i task
 9. Hvordan skal en unit/machine velge hvilken task som skal kjøres?
 10. Trenger vi unit number til noe egentlig? Tenker Unit kun tar in en liste med task i konstruktøren
-
