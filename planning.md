@@ -25,6 +25,11 @@ The Simulator class would use the scheduler to simulate the production process b
 
 2. The problem with this task is that when a batch is finished its not garanteed that the input buffer on the next machine hase enough place to store the batch. The task states that batches must be unloaded from units as soon as they are processed. If the batch is to big to be placed in the next input buffer then everything stops because our simulation is in a illegal state? Or it is simply blocked until it is space in the input buffer.
 3. What is a "machine" compared to a unit and buffer?
-4. 
+    - Jon: Tenker machine og unit er det samme
+4. Skal vi validere input i denne øvingen?
+5. Hvorfor har vi ikke en input buffer for task 1?
+6. addBatchToBuffer-funksjonen, vi burde sjekke om det er plass før vi adder til buffer
+8. Procesing time burde være en attribute i task
+9. Hvordan skal en unit/machine velge hvilken task som skal kjøres?
 
 
