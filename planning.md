@@ -31,5 +31,5 @@ The Simulator class would use the scheduler to simulate the production process b
 6. addBatchToBuffer-funksjonen, vi burde sjekke om det er plass før vi adder til buffer
 8. Procesing time burde være en attribute i task
 9. Hvordan skal en unit/machine velge hvilken task som skal kjøres?
-
+10. Trenger vi unit number til noe egentlig? Tenker Unit kun tar in en liste med task i konstruktøren
 
