@@ -32,6 +32,11 @@ class Buffer:
             self.waferCount += batch.getBatchSize()
         return self.waferCount
     
+    def getIsFull(self):
+        if self.getBufferSize() == self.getBufferCapacity():
+            return True
+        return False
+    
     def validateBufferSize(self):
         if self.isLastBuffer:
             return
@@ -39,15 +44,18 @@ class Buffer:
             if self.getBufferSize() > self.getBufferCapacity() or self.getBufferSize() < 0:
                 raise ValueError("Buffer size is {}, cannot exceed buffer capacity of {} wafers, or be negative".format(self.getBufferSize(), self.getBufferCapacity()))        
     
+
     def addBatchToBuffer(self, batch: Batch): #adds a batch to the end of the queue
-        self.validateBufferSize()
         batch.incrementTick(1) #it takes 1 tick to add a batch to the buffer
         self.batches.append(batch)
+        self.validateBufferSize() #check if buffer size is valid after adding a new batch
 
-    def removeBatchFromBuffer(self, batch: Batch): #removes a batch from the front of the queue
+    def removeBatchFromBuffer(self): #removes a batch from the front of the queue
         self.validateBufferSize()
-        batch.incrementTick(1) #it takes 1 tick to remove a batch from the buffer
         return self.batches.pop(0) 
+    
+    def getBatchesInBuffer(self):
+        return self.batches
     
     def __str__(self):
         return "Buffer size: " + str(self.getBufferSize()) + " batches. Buffer capacity: " + str(self.getBufferCapacity()) + " wafers."
@@ -75,7 +83,7 @@ def main():
     # print the buffer
     print(buffer)
     # remove the batch from the buffer
-    buffer.removeBatchFromBuffer(batch1)
+    buffer.removeBatchFromBuffer()
     # print the buffer
     print(buffer)
 

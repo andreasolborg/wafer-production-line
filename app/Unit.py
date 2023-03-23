@@ -49,4 +49,9 @@ class Unit:
     def setBatchInUnit(self, batch):
         if self.unitIsEmpty() == False:
             raise ValueError("Batch is already in unit.")
+        self.batchInUnit = batch
+        self.setIsProcessing(True)
+        self.setIsFinished(False)
+
+        
         

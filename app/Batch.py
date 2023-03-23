@@ -10,8 +10,8 @@ class Batch:
     def __init__(self, size: int): #evnt wafers: list[Wafer]):
         self.size = size
         self.validateBatchSize()
-        self.tick = 1 # starts at 1 so we dont need a input buffer for the first task
-        
+        self.tick = 0 # starts at 1 so we dont need a input buffer for the first task
+
         # self.task = 0 #task number that the batch is currently in, not needed because we can use the index of the batch in the task's buffer
         # self.wafers = wafers
 
@@ -32,7 +32,7 @@ class Batch:
         self.tick += tick
 
     def __str__(self):
-        return "Batch size: " + str(self.size) + " wafers. Tick: " + str(self.tick)
+        return "Object ID: " + str(id(self)) + ", Batch size: " + str(self.getBatchSize()) + ", Tick: " + str(self.getTick())
 
 
 def main():
