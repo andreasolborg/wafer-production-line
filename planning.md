@@ -1,14 +1,14 @@
 # Planning
 ## Structure
 **Wafer:** a class that represents a single wafer, with attributes such as size, thickness, and any other relevant properties. May not be neccessary after all.
-**Buffer** Class for buffers. Each task has a input buffer.
+**Buffer** Class for buffers. Each task has a input buffer, and a output buffer. Task 1's output buffer corresponds as task2's input buffer. Each time a batch is placed in a buffer, it adds 2 ticks to the batch object.
 **Batch:** a class that represents a batch of wafers, with attributes such as size and a list of the wafers in the batch.  
 **Task:** a class that represents a task to be performed on a batch of wafers, with attributes such as processing time and input/output buffers.  
 **Unit:** a class that represents a unit in the production line, with attributes such as a list of tasks it can perform and input/output buffers for each task.  
 **ProductionLine:** a class that represents the entire production line, with attributes such as a list of units, input/output buffers for the entire line, and a scheduler for managing the order of tasks.  
 **Simulator:** a class that simulates the production process by scheduling and executing tasks on the production line.
 
-**Tick:** We should have a tick-system where each tick is 0.1 seconds. We check if we can advance in the production line every tick.
+**Tick:** We should have a tick-system where each tick is 0.1 (or a float value, but the task kind of suggests it being 0.1) seconds. We check if we can advance in the production line every tick.
 
 Each class would have methods for performing various operations on its respective objects, such as loading and unloading batches, assigning input/output buffers, calculating processing times, etc.
 
