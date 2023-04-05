@@ -7,6 +7,7 @@ class Task:
     A task can perform only one batch at a time.
     Each task has a different processing time.
     The last task in the unit has output buffer with unlimited capacity.
+    
     ********************************************************************
     |Task                1    2     3    4    5     6    7    8     9   |
     |------------------------------------------------------------------ |
@@ -46,49 +47,66 @@ class Task:
     
     def getBatchInTask(self):
         return self.batchInTask
-    
+        
     def setBatchInTask(self, batch):
         # check if task is already processing a batch, and if the batch is not None
         if self.getIsProcessing() == True and batch != None:
             raise ValueError("Task is already processing a batch.")
         self.batchInTask = batch
         self.setIsProcessing(True)
-        self.setIsFinished(False)
+        
+    def removeBatchFromTask(self):
+        batch = self.getBatchInTask()
+        self.setBatchInTask(None)
+        self.setIsProcessing(False)
+        return batch
 
     def setInputBuffer(self, buffer):
         self.inputBuffer = buffer
 
     def setOutputBuffer(self, buffer):
         self.outputBuffer = buffer
+        
+    def getInputBuffer(self):
+        return self.inputBuffer
+    
+    def getOutputBuffer(self):
+        return self.outputBuffer
 
     # if batch has been in task for the processing time, set isFinished to True. Then the batch can be unloaded from the unit, and sent to the next task
     def incrementTick(self, tick: float):
         self.tick += tick
+        totalProcessingTime = 0
+
+        print("\nIncrementing tick... by {}".format(tick))
+        if self.inputBuffer == None and self.outputBuffer == None:
+            raise ValueError("Task must have an input buffer and an output buffer.")
         print(f"Task {self.getTaskNumber()} has tick {self.getTick()}.")
-        if self.getIsProcessing() == False:
-            # check if the task has a batch in it, and if the input buffer has a batch in it
-            if self.getBatchInTask() == None and self.inputBuffer != None:
-                if self.inputBuffer.getBatches() != None: 
-                    self.setBatchInTask(self.inputBuffer.removeBatchFromBuffer())
-                    print(f"Batch {self.getBatchInTask()} has been loaded into task {self.getTaskNumber()}.")
+        if self.getIsProcessing() == False:                                          # if the task is not processing a batch, load a batch into the task
+            if self.getBatchInTask() == None and not self.inputBuffer.getIsEmpty():  # check if the task has a batch in it, and if the input buffer has a batch in it
+                self.setBatchInTask(self.inputBuffer.removeBatchFromBuffer())
+                print(f"Batch {self.getBatchInTask()} load into task {self.getTaskNumber()}.")
             else:
                 print(f"Task {self.getTaskNumber()} is not processing a batch.")
+                
+        if self.getBatchInTask() != None:
+            batchSize = self.getBatchInTask().getBatchSize()
+            totalProcessingTime = self.getProcessingTime() * batchSize
+            print("Total processing time: {}".format(totalProcessingTime))
         
-        if self.getTick() >= self.getProcessingTime():
-            print("FINISHED PROCESSING BATCH")
+        if self.getTick() >= totalProcessingTime:
             # check if task has a batch in it, and increment the tick of the batch in the task
-            print(f"Task {self.getTaskNumber()} has finished processing batch {self.getBatchInTask()}.")
+            print(f"Task {self.getTaskNumber()} has finished processing batch {self.getBatchInTask()}. After {self.getTick()} seconds.")    
             if self.getBatchInTask() != None:
                 self.getBatchInTask().incrementTick(self.getTick())
-            self.setIsFinished(True)
             self.setIsProcessing(False)
             self.tick = 0 # reset the tick to 0 for the next batch that will be processed in the task 
 
             # send the batch to the output buffer
-            if self.outputBuffer != None:
+            if self.outputBuffer != None and self.getBatchInTask() != None:
                 self.outputBuffer.addBatchToBuffer(self.getBatchInTask())
                 print(f"Batch {self.getBatchInTask()} has been sent to the output buffer of task {self.getTaskNumber()}.")
-                self.setBatchInTask(None)
+                self.removeBatchFromTask()
             else:
                 print(f"Task {self.getTaskNumber()} has no output buffer.")
                 
@@ -109,7 +127,7 @@ class Task:
         self.isFinished = isFinished
 
     def __str__(self):
-        return f"Task {self.getTaskNumber()} has input buffer {self.inputBuffer}, output buffer {self.outputBuffer}, processing time {self.getProcessingTime()}, batch in task {self.getBatchInTask()}, is processing {self.getIsProcessing()}, is finished {self.getIsFinished()}, tick {self.getTick()}."
+        return f"Task {self.getTaskNumber()}: input {self.inputBuffer}, output {self.outputBuffer} processTime: {self.getProcessingTime()}, Processing: {self.getIsProcessing()}, tick: {self.getTick()}"
 
 
 def main():
@@ -121,7 +139,7 @@ def main():
     #     print(task)
 
     # make a batch of size 20
-    batch = Batch(20)
+    batch = Batch(30)
 
     task1 = Task(1)
     print("Æ")
@@ -131,13 +149,16 @@ def main():
     task1.setInputBuffer(buffer1)
     task1.setOutputBuffer(buffer2)
     buffer1.addBatchToBuffer(batch)
-    print(task1)
 
-    task1.incrementTick(0.5)
+    task1.incrementTick(14.8)
+    task1.incrementTick(0.1)
+    task1.incrementTick(0.1)
+    
+    print(task1)
     print("Task1 input: ", task1.inputBuffer)
     print("Task1 output: ", task1.outputBuffer)
 
-    print("\n\n********* TASK 2 *********")
+    print("\n********* TASK 2 *********")
     task2 = Task(2)
     task2.setInputBuffer(task1.outputBuffer)
     task2.setOutputBuffer(buffer3)
@@ -147,12 +168,11 @@ def main():
 
     print("\n********")
     print(task2)
-    task2.incrementTick(3.5)
+    task2.incrementTick(23.5)
 
     print("\n********")
     print("Task 2 input: ", task2.inputBuffer)
     print("Task 2 output: ", task2.outputBuffer)
-
 
 
 

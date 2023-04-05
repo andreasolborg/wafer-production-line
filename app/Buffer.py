@@ -37,6 +37,12 @@ class Buffer:
             return True
         return False
     
+    def getIsEmpty(self):
+        if self.getBufferSize() == 0:
+            return True
+        return False
+    
+    
     def validateBufferSize(self):
         if self.isLastBuffer:
             return
@@ -47,8 +53,8 @@ class Buffer:
 
     def addBatchToBuffer(self, batch: Batch): #adds a batch to the end of the queue
         batch.incrementTick(1) #it takes 1 tick to add a batch to the buffer
-        self.batches.append(batch)
         self.validateBufferSize() #check if buffer size is valid after adding a new batch
+        self.batches.append(batch)
 
     def removeBatchFromBuffer(self): #removes a batch from the front of the queue
         self.validateBufferSize()
@@ -58,7 +64,7 @@ class Buffer:
         return self.batches
     
     def __str__(self):
-        return "Buffer size: " + str(self.getBufferSize()) + " batches. Buffer capacity: " + str(self.getBufferCapacity()) + " wafers."
+        return "Buffer: " + str(self.getBufferSize()) + "/" + str(self.getBufferCapacity())
     
 
 def main():

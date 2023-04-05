@@ -32,7 +32,7 @@ class Batch:
         self.tick += tick
 
     def __str__(self):
-        return "Object ID: " + str(id(self)) + ", Batch size: " + str(self.getBatchSize()) + ", Tick: " + str(self.getTick())
+        return "ID: " + str(id(self))
 
 
 def main():
