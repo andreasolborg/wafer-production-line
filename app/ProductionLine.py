@@ -1,14 +1,44 @@
 from Task import Task
 from Buffer import Buffer
 from Unit import Unit
+from Batch import Batch
+from Scheduler import Scheduler
 
 class ProductionLine:
     '''
     A class that represents the entire production line, with attributes such as a list of units,
     and a scheduler for managing the order of tasks.
+    The production line holds a global tick-value to keep track of simultaion time in the production line. 
+    This class also assigns batches to tasks, and moves batches between tasks and units. 
+    Upon initzialization, the input and output buffers are assigned to tasks in the production line.
     '''
-    pass
+    def __init__(self, units: list[Unit]):
+        self.units = units
+        self.tick = 0
+        # self.scheduler = Scheduler()
+
+    def getUnits(self):
+        return self.units
     
+    def getTick(self):
+        return self.tick
+    
+    def incrementTick(self):
+        for unit in self.getUnits():
+            tasks = unit.getTasks()
+            for task in tasks:
+                task.incrementTick()
+        self.tick += 0.1
+
+    def assignInputBufferToTask(self, task: Task, buffer: Buffer):
+        task.setInputBuffer(buffer)
+
+    def assignOutputBufferToTask(self, task: Task, buffer: Buffer):
+        task.setOutputBuffer(buffer)
+
+
+
+
 
 
 
