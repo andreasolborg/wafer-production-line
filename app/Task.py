@@ -77,13 +77,11 @@ class Task:
         totalProcessingTime = 0                                                      # the total processing time for the batch in the task. If no batch in task, this is zero.
         if self.inputBuffer == None and self.outputBuffer == None:
             raise ValueError("Task must have an input buffer and an output buffer.")
-        print(f"Task {self.getTaskNumber()} has tick {self.getTaskTick()}.")
+        # print(f"Task {self.getTaskNumber()} has tick {self.getTaskTick()}.")
         if self.getIsProcessing() == False:                                          # if the task is not processing a batch, load a batch into the task
             if self.getBatchInTask() == None and not self.inputBuffer.getIsEmpty():  # check if the task has a batch in it, and if the input buffer has a batch in it
                 self.setBatchInTask(self.inputBuffer.removeBatchFromBuffer())
                 print(f"Batch {self.getBatchInTask()} load into task {self.getTaskNumber()}.")
-            else:
-                print(f"Task {self.getTaskNumber()} is not processing a batch.")
                 
         if self.getBatchInTask() != None:
             batchSize = self.getBatchInTask().getBatchSize()
@@ -92,18 +90,18 @@ class Task:
         
         if self.getTaskTick() >= totalProcessingTime:
             # check if task has a batch in it, and increment the tick of the batch in the task
-            print(f"Task {self.getTaskNumber()} has finished processing batch {self.getBatchInTask()}. After {self.getTaskTick()} seconds.")    
             if self.getBatchInTask() != None:
+                print(f"Task {self.getTaskNumber()} has finished processing batch {self.getBatchInTask()}. After {self.getTaskTick()} seconds.")    
                 self.getBatchInTask().incrementTick(self.getTaskTick())
             self.setIsProcessing(False)
             self.taskTick = 0 # reset the tick to 0 for the next batch that will be processed in the task 
 
             # send the batch to the output buffer
-            if self.outputBuffer != None and self.getBatchInTask() != None:
-                self.outputBuffer.addBatchToBuffer(self.getBatchInTask())
-                print(f"Batch {self.getBatchInTask()} has been sent to the output buffer of task {self.getTaskNumber()}.")
-                self.removeBatchFromTask()
-            else:
+            if self.outputBuffer != None:
+                self.outputBuffer.addBatchToBuffer(self.removeBatchFromTask())
+                print(f"Batch {self.getBatchInTask()} unloaded from task {self.getTaskNumber()}.")
+
+            elif self.outputBuffer == None:
                 print(f"Task {self.getTaskNumber()} has no output buffer.")
 
     # if batch has been in task for the processing time, set isFinished to True. Then the batch can be unloaded from the unit, and sent to the next task. tick argument is optional
@@ -111,7 +109,8 @@ class Task:
         if tick == None: # if no tick is given, increment by 0.1
             tick = 0.1
         self.taskTick += tick
-        print("\nIncrementing tick... by {}".format(tick))
+        # print("\nIncrementing tick... by {}".format(tick))
+        # print("task class update task status")
         self.updateTaskStatus() # update the status of the task, and check if the batch has been processed for the processing time
 
     def getTaskTick(self):

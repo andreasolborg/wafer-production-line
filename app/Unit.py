@@ -31,7 +31,11 @@ class Unit:
         else:
             for task in self.getTasks():
                 if task.getIsProcessing() == True:
+                    self.setIsProcessing(True)
                     return True
+                else:
+                    self.setIsProcessing(False)
+                    return False
     
     def determineMultipleTasksProcessing(self):
         count = 0
@@ -54,6 +58,15 @@ class Unit:
     def setBatchInUnit(self, batch: Batch):
         self.batchInUnit = batch
         
+    def incrementTick(self, tick: int):
+        self.tick += tick
+        for task in self.getTasks():
+            task.incrementTaskTick(tick)
+            if task.getIsProcessing() == True:
+                self.setBatchInUnit(task.getBatchInTask())
+                if task.getIsProcessing() == False:
+                    self.setBatchInUnit(None)
+
 
         
 def main():
@@ -94,12 +107,12 @@ def main():
     task6.setOutputBuffer(buffer6)
     
     task1.getInputBuffer().addBatchToBuffer(batch)
-    task1.incrementTick(10) # simulate 5 ticks of processing, it is not done yet. Need 10 ticks to complete.
+    task1.incrementTaskTick(10) # simulate 5 ticks of processing, it is not done yet. Need 10 ticks to complete.
     
     task6.getInputBuffer().addBatchToBuffer(batch1)
-    task6.incrementTick(5) # simulate 5 ticks of processing, it is not done yet. Need 10 ticks to complete.
+    task6.incrementTaskTick(5) # simulate 5 ticks of processing, it is not done yet. Need 10 ticks to complete.
     
-    unit1.determineIsProcessing()
+    print(unit1.determineIsProcessing())
     
     
     
