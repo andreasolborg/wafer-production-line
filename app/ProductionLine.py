@@ -120,10 +120,9 @@ def main():
     for i in range(0, 1000):
         productionLine.incrementTick()
         print("Tick: ", productionLine.getTick())
-        print("\n\n")
-
-    
-
+        for unit in productionLine.getUnits():
+            unit.simulateUnit()
+            print("Unit: ", unit.getTasks())
 if __name__ == "__main__":
     main()        
     

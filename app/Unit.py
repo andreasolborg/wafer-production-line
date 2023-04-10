@@ -20,6 +20,12 @@ class Unit:
     def getTasks(self):
         return self.tasks
     
+    def getTask(self, taskNumber: int):
+        for task in self.getTasks():
+            if task.getTaskNumber() == taskNumber:
+                return task
+        raise ValueError("Task number {} does not exist in unit.".format(taskNumber))
+
     def unitIsEmpty(self):
         if self.getBatchInUnit() == None:
             return True
@@ -67,7 +73,16 @@ class Unit:
                 if task.getIsProcessing() == False:
                     self.setBatchInUnit(None)
 
-
+    def simulateUnit(self):
+        '''
+        Simulate the unit. 
+        '''
+        for task in self.getTasks():
+            task.simulateTask(0.1)
+            if task.getIsProcessing() == True:
+                self.setBatchInUnit(task.getBatchInTask())
+                if task.getIsProcessing() == False:
+                    self.setBatchInUnit(None)
         
 def main():
     '''

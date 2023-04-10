@@ -113,6 +113,9 @@ class Task:
         # print("task class update task status")
         self.updateTaskStatus() # update the status of the task, and check if the batch has been processed for the processing time
 
+    def simulateTask(self, tick):
+        self.incrementTaskTick(tick)
+
     def getTaskTick(self):
         return self.taskTick
     
@@ -125,6 +128,8 @@ class Task:
     def __str__(self):
         return f"Task {self.getTaskNumber()}: input {self.inputBuffer}, output {self.outputBuffer} processTime: {self.getProcessingTime()}, Processing: {self.getIsProcessing()}, tick: {self.getTaskTick()}"
 
+    def __repr__(self):
+        return f"Task {self.getTaskNumber()}: input {self.inputBuffer}, output {self.outputBuffer} processTime: {self.getProcessingTime()}, Processing: {self.getIsProcessing()}, tick: {self.getTaskTick()}"
 
 def main():
     print("This is the Task class.")
