@@ -97,7 +97,7 @@ class Task:
             self.taskTick = 0 # reset the tick to 0 for the next batch that will be processed in the task 
 
             # send the batch to the output buffer
-            if self.outputBuffer != None:
+            if self.outputBuffer != None and self.getBatchInTask() != None:
                 self.outputBuffer.addBatchToBuffer(self.removeBatchFromTask())
                 print(f"Batch {self.getBatchInTask()} unloaded from task {self.getTaskNumber()}.")
 
