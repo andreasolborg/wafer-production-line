@@ -144,7 +144,7 @@ class Simulation:
     def simulate(self):
         current_tick = 0
 
-        initial_batches = [Batch(20, 1), Batch(20, 2), Batch(20, 3), Batch(20, 4), Batch(20, 5)]
+        initial_batches = [Batch(20, 1), Batch(30, 2), Batch(50, 3), Batch(40, 4), Batch(20, 5)]
 
         production_line = ProductionLine()
 
