@@ -43,14 +43,16 @@ class Task:
         self.batch_in_task = self.inputbuffer.remove_batch()
         if self.batch_in_task:  # Check if there's a batch to process
             self.locked_to = self.batch_in_task.size * self.time_per_wafer + current_tick
-            print("tick:", current_tick, "---", self, "batch", self.batch_in_task.id, "is finished at", self.locked_to)
+            print("tick:", current_tick, "---", self, "batch", self.batch_in_task.id, "loaded and finished at", self.locked_to)
             return self.locked_to
         return None  # Return None if there's no batch to process
 
     def unload(self, current_tick):
         if self.batch_in_task:
             self.outputbuffer.add_batch(self.batch_in_task)
+            print("tick:", current_tick, "---", self, "batch", self.batch_in_task.id, "unloaded")
             self.batch_in_task = None
+           
 
     def __str__(self):
         return "task" + str(self.id)
