@@ -172,7 +172,7 @@ class Simulation:
             # If the event action is load we try to load the unit and if we succeed we add an unload event to a calculated future tick
             if event.action == "load":
                 if unit.load(current_tick):
-                    event = Event(unit.locked_to_tick, "unload", unit)
+                    event = Event(unit.locked_to_tick + 1, "unload", unit)
                     heapq.heappush(event_queue, event)
 
             # If the event action is unload we try to unload the unit and if we succeed we add a load event to the event queue
@@ -182,7 +182,7 @@ class Simulation:
                 # But it it dosent hurt to add a load event for all units, and its easier to implement
                 # The load event on the third unit will just dissapear if the unit is busy anyways
                 for unit in production_line.units:
-                    event = Event(current_tick, "load", unit)
+                    event = Event(current_tick + 1, "load", unit)
                     heapq.heappush(event_queue, event)
 
 
