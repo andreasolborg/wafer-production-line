@@ -179,7 +179,8 @@ class Simulation:
             elif event.action == "unload":
                 unit.unload(current_tick)
                 # We really just need to call a new load event on the unit that just was unloaded and the unit that just got its inputbuffer loaded with the unloaded batch
-                # But it it dosent hurt to add a load event for all units
+                # But it it dosent hurt to add a load event for all units, and its easier to implement
+                # The load event on the third unit will just dissapear if the unit is busy anyways
                 for unit in production_line.units:
                     event = Event(current_tick, "load", unit)
                     heapq.heappush(event_queue, event)
@@ -187,14 +188,7 @@ class Simulation:
 
             # If a load event cant go trough because a unit is busy the event gets removed from the queue
             # This is not a problem because a new load event will be added to the queue when the unit is done with its locked task
-            # Then the first item in the buffer will be loaded
-            # I will try to show the event queue process with a example:
-            #
-            # Event queue: [0|load|unit1] [0|load|unit2] [0|load|unit3]
-
-            
-                
-
+            # Then the first item in the buffer will be loaded   
 
 
 def main():
