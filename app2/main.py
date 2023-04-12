@@ -18,6 +18,9 @@ class Buffer:
             self.content.append(batch)
             return True
         else:
+            # The task states: "Batches must be unloaded from units as soon as they are processed"
+            # Does this mean that they dissapear if its no space in the outputbuffer?
+            # Does the whole system collapse?
             print(batch, " is gone, was unloaded, but no space in outputbuffer")
 
     def remove_batch(self):
@@ -191,7 +194,6 @@ class Simulation:
             # If a load event cant go trough because a unit is busy the event gets removed from the queue
             # This is not a problem because a new load event will be added to the queue when the unit is done with its locked task
             # Then the first item in the buffer will be loaded   
-
 
 def main():
     sim = Simulation()
