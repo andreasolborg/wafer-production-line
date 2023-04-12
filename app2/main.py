@@ -144,7 +144,7 @@ class Simulation:
     def simulate(self):
         current_tick = 0
 
-        initial_batches = [Batch(20, 1), Batch(30, 2), Batch(50, 3), Batch(40, 4), Batch(20, 5)]
+        initial_batches = [Batch(20, 1), Batch(20, 2), Batch(20, 3), Batch(20, 4), Batch(20, 5)]
 
         production_line = ProductionLine()
 
@@ -156,7 +156,7 @@ class Simulation:
 
         # Start the simulation by adding a load event for each unit
         for unit in production_line.units:
-            event = Event(current_tick, "load", unit)
+            event = Event(current_tick + 1, "load", unit) # We can also start the process by just adding a event on the first unit
             # heappush is the same as append
             # heappop is the same as pop(0)
             # the different between a heapq and a list is that at any given time the first element is going to be the minimum element
