@@ -172,6 +172,8 @@ class Simulation:
             # If the event action is load we try to load the unit and if we succeed we add an unload event to a calculated future tick
             if event.action == "load":
                 if unit.load(current_tick):
+                    # the "+ 1" is the time it takes to unload the batch from the task in the unit
+                    # we add 1 second to the loading of a task also 
                     event = Event(unit.locked_to_tick + 1, "unload", unit)
                     heapq.heappush(event_queue, event)
 
