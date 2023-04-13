@@ -42,6 +42,8 @@ class Task:
         self.batch_in_task = None
 
     def load(self, current_tick):
+        # A batch must be unloaded immediately after its processed so we cant load a batch if it will be no space in the outputbuffer when its done
+        # If it has space at the current tick we now that it will have space in the future (this is a temporary solution)
         if not self.check_if_outputbuffer_has_space_now():
             return False
 
@@ -69,6 +71,9 @@ class Task:
                 print(self.inputbuffer.content[-1], " has to wait before loaded")
                 return False
             return True
+        
+    def check_if_outputbuffer_has_space_in_the_future(self, current_tick):
+
 
     def __str__(self):
         return "task" + str(self.id)
