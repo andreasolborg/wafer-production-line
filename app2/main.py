@@ -1,4 +1,5 @@
 import heapq
+import math
 
 class Batch:
     def __init__(self, size, id):
@@ -41,7 +42,11 @@ class Task:
         self.batch_in_task = None
 
     def load(self, current_tick):
+        if not self.check_if_outputbuffer_has_space_now():
+            return False
+
         self.batch_in_task = self.inputbuffer.remove_batch()
+
         if self.batch_in_task:  # Check if there's a batch to process
             locked_to_tick = self.batch_in_task.size * self.time_per_wafer + current_tick
             print("tick:", current_tick, "---", self, "batch", self.batch_in_task.id, "loaded and finishes at", locked_to_tick)
@@ -54,7 +59,17 @@ class Task:
                 print("tick:", current_tick, "---", self, "batch", self.batch_in_task.id, "unloaded")
                 self.batch_in_task = None
                 return True
-           
+    
+    # The rule we use now is that we dont load a task if the outputbuffer dosent have space for the whole batch at the current_tick
+    # Of course the outputbuffer can have space when the task is done in the future, but we havent implemented this logic yet
+    # The new function will be called check_if_outputbuffer_has_space_in_the_future
+    def check_if_outputbuffer_has_space_now(self):
+        if self.inputbuffer.content:
+            if self.outputbuffer.get_total_wafers() + self.inputbuffer.content[-1].size > self.outputbuffer.capacity:
+                print(self.inputbuffer.content[-1], " has to wait before loaded")
+                return False
+            return True
+
     def __str__(self):
         return "task" + str(self.id)
 
@@ -95,16 +110,16 @@ class Unit:
 
 class ProductionLine:
     def __init__(self):
-        start_buffer = Buffer(999999)
-        buffer2 = Buffer(1200)
-        buffer3 = Buffer(1200)
-        buffer4 = Buffer(1200)
-        buffer5 = Buffer(1200)
-        buffer6 = Buffer(1200)
-        buffer7 = Buffer(1200)
-        buffer8 = Buffer(1200)
-        buffer9 = Buffer(1200)
-        end_buffer = Buffer(999999)
+        start_buffer = Buffer(math.inf) # We assume the start buffer has infinite capacity
+        buffer2 = Buffer(120)
+        buffer3 = Buffer(120)
+        buffer4 = Buffer(120)
+        buffer5 = Buffer(120)
+        buffer6 = Buffer(120)
+        buffer7 = Buffer(120)
+        buffer8 = Buffer(120)
+        buffer9 = Buffer(120)
+        end_buffer = Buffer(math.inf) # We assume the end buffer has infinite capacity
 
         task1 = Task(1, 0.5, start_buffer, buffer2)
         task2 = Task(2, 3.5, buffer2, buffer3)
@@ -144,7 +159,8 @@ class Simulation:
     def simulate(self):
         current_tick = 0
 
-        initial_batches = [Batch(20, 1), Batch(30, 2), Batch(50, 3), Batch(40, 4), Batch(20, 5)]
+        initial_batches = [Batch(50, 1), Batch(50, 2), Batch(50, 3), Batch(50, 4), Batch(50, 5)]
+
 
         production_line = ProductionLine()
 
