@@ -3,6 +3,8 @@ from Batch import Batch
 from ProductionLine import ProductionLine
 from Event import Event 
 
+import random
+
 class Simulation:
 
     def divide_into_equal_size_batches(self, total, batch_size):
@@ -31,10 +33,22 @@ class Simulation:
         current_time = 0
         load_unload_time = 1
 
-        initial_batches = self.divide_into_equal_size_batches(1000, 50)
 
-        for i in initial_batches:
-            print(i.id, i.size)
+        # make batches of size between 20 and 70 for a total of 1000 batches
+        initial_batches = []
+        size_of_batches = 0
+        id = 0
+        while size_of_batches < 1000:
+            id += 1
+            batch_size = random.randint(20, 70)
+            size_of_batches += batch_size
+            initial_batches.append(Batch(batch_size, id))
+
+        for batch in initial_batches:
+            print(batch)
+
+        
+
 
         production_line = ProductionLine()
 
