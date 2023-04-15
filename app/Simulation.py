@@ -29,20 +29,23 @@ class Simulation:
 
         return batches
 
-    def simulate(self):
-        current_time = 0
-        load_unload_time = 1
-
-
+    def divide_into_random_size_batches(self, total):
         # make batches of size between 20 and 70 for a total of 1000 batches
         initial_batches = []
         size_of_batches = 0
         id = 0
-        while size_of_batches < 1000:
+        while size_of_batches < total:
             id += 1
-            batch_size = random.randint(20, 70)
+            batch_size = random.randint(20, 50)
             size_of_batches += batch_size
-            initial_batches.append(Batch(batch_size, id))
+            initial_batches.append(Batch(id, batch_size))
+        return initial_batches
+
+    def simulate(self):
+        current_time = 0
+        load_unload_time = 1
+
+        initial_batches = self.divide_into_random_size_batches(1000)
 
         for batch in initial_batches:
             print(batch)
