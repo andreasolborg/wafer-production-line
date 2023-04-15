@@ -7,7 +7,7 @@ import random
 
 class Simulation:
 
-    def divide_into_equal_size_batches(self, total, batch_size):
+    def divide_into_most_equal_sized_batches(self, total, batch_size):
         if batch_size < 20:
             batch_size = 20
         elif batch_size > 50:
@@ -29,8 +29,8 @@ class Simulation:
 
         return batches
 
-    def divide_into_random_size_batches(self, total):
-        # make batches of size between 20 and 70 for a total of 1000 batches
+    def divide_into_random_sized_batches(self, total):
+        # make batches of size between 20 and 50 for a total of 1000 batches
         initial_batches = []
         size_of_batches = 0
         id = 0
@@ -49,9 +49,6 @@ class Simulation:
 
         for batch in initial_batches:
             print(batch)
-
-        
-
 
         production_line = ProductionLine()
 
