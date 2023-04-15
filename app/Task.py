@@ -39,18 +39,21 @@ class Task:
         
         potential_active_batch = self.inputbuffer.content[-1]
 
-        unit_with_next_buffer = production_line.get_unit_to_inputbuffer(self.outputbuffer)
+        #unit_with_next_buffer = production_line.get_unit_to_inputbuffer(self.outputbuffer)
         
-        time_until_this_unit_is_finished = potential_active_batch.size * self.time_per_wafer + current_time
-        time_unitl_next_unit_is_finished = unit_with_next_buffer.time_until_finished
+        #time_until_this_unit_is_finished = potential_active_batch.size * self.time_per_wafer + current_time
+        #time_unitl_next_unit_is_finished = unit_with_next_buffer.time_until_finished
         
-        if time_until_this_unit_is_finished <= time_unitl_next_unit_is_finished:
-            if self.inputbuffer.content[-1].size > self.outputbuffer.capacity - self.outputbuffer.get_total_wafers() - self.outputbuffer.content[-1].size:
-                return False
-        else:
-            if self.outputbuffer.get_total_wafers() + self.inputbuffer.content[-1].size > self.outputbuffer.capacity:
-                return False
-        return True
+        
+        if self.outputbuffer.get_total_wafers() + potential_active_batch.size <= self.outputbuffer.capacity:
+            return True
+
+        #if current_time < unit_with_next_buffer.time_until_finished:
+        #    if time_until_this_unit_is_finished <= time_unitl_next_unit_is_finished:
+        #        if potential_active_batch.size <= self.outputbuffer.capacity - self.outputbuffer.get_total_wafers() - self.outputbuffer.content[-1].size:
+        #            return True
+                
+        return False
 
     def __str__(self):
         return "task" + str(self.id)

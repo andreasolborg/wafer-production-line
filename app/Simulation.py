@@ -4,11 +4,37 @@ from ProductionLine import ProductionLine
 from Event import Event 
 
 class Simulation:
+
+    def divide_into_equal_size_batches(self, total, batch_size):
+        if batch_size < 20:
+            batch_size = 20
+        elif batch_size > 50:
+            batch_size = 50
+
+        num_batches, remainder = divmod(total, batch_size)
+        batches = [Batch(i, batch_size) for i in range(1, num_batches + 1)]
+
+        if remainder > 0 and remainder < 20:
+            items_to_distribute = remainder
+            for batch in batches:
+                if items_to_distribute == 0:
+                    break
+                if batch.size < 50:
+                    batch.size += 1
+                    items_to_distribute -= 1
+        elif remainder >= 20:
+            batches.append(Batch(num_batches + 1, remainder))
+
+        return batches
+
     def simulate(self):
         current_time = 0
         load_unload_time = 1
 
-        initial_batches = [Batch(50, 1), Batch(50, 2), Batch(50, 3), Batch(50, 4), Batch(50, 5)]
+        initial_batches = self.divide_into_equal_size_batches(1000, 50)
+
+        for i in initial_batches:
+            print(i.id, i.size)
 
         production_line = ProductionLine()
 
