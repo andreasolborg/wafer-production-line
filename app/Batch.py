@@ -4,4 +4,4 @@ class Batch:
         self.size = size
 
     def __str__(self):
-        return "batch" + str(self.id)
+        return "batch" + str(self.id) + " size: " + str(self.size)
