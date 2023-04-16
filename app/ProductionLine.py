@@ -31,9 +31,5 @@ class ProductionLine:
         self.unit3 = Unit(3, [self.task4, self.task8])
 
         self.units = [self.unit1, self.unit2, self.unit3]
-        
-    def get_unit_to_inputbuffer(self, outputbuffer):
-        for unit in self.units:
-            for task in unit.tasks:
-                if task.inputbuffer == outputbuffer:
-                    return unit
+
+        self.buffers = [self.start_buffer, self.buffer2, self.buffer3, self.buffer4, self.buffer5, self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.end_buffer]    

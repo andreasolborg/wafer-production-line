@@ -17,15 +17,16 @@ class Task:
         self.active_batch = self.inputbuffer.remove_batch()
         
         if self.active_batch: 
-            time_until_finished = self.active_batch.size * self.time_per_wafer + current_time
-            print("tick:", current_time, "---", self, "batch", self.active_batch.id, "loaded and finishes at", time_until_finished)
+            time_until_finished = round(self.active_batch.size * self.time_per_wafer + current_time,1)
+            print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
             return time_until_finished
+        
         return False  
 
     def unload(self, current_time):
         if self.active_batch:
             if self.outputbuffer.add_batch(self.active_batch):
-                print("tick:", current_time, "---", self, "batch", self.active_batch.id, "unloaded")
+                print("tick:", current_time, "---", self, self.active_batch, "unloaded")
                 self.active_batch = None
         
     def check_if_outputbuffer_has_space(self, current_time, production_line):
@@ -37,22 +38,12 @@ class Task:
         if not self.outputbuffer.content:
             return True
         
-        potential_active_batch = self.inputbuffer.content[-1]
+        potential_active_batch = self.inputbuffer.content[0]
 
-        #unit_with_next_buffer = production_line.get_unit_to_inputbuffer(self.outputbuffer)
-        
-        #time_until_this_unit_is_finished = potential_active_batch.size * self.time_per_wafer + current_time
-        #time_unitl_next_unit_is_finished = unit_with_next_buffer.time_until_finished
-        
-        
+        print("hascapacity", self.outputbuffer.get_total_wafers(), potential_active_batch.size, self.outputbuffer.capacity)
         if self.outputbuffer.get_total_wafers() + potential_active_batch.size <= self.outputbuffer.capacity:
-            return True
-
-        #if current_time < unit_with_next_buffer.time_until_finished:
-        #    if time_until_this_unit_is_finished <= time_unitl_next_unit_is_finished:
-        #        if potential_active_batch.size <= self.outputbuffer.capacity - self.outputbuffer.get_total_wafers() - self.outputbuffer.content[-1].size:
-        #            return True
-                
+            return True 
+        
         return False
 
     def __str__(self):

@@ -8,6 +8,7 @@ class Buffer:
         if self.get_total_wafers() + batch.size <= self.capacity:
             self.content.append(batch)
             return True
+        #print("GONE WRONG")
         return False
 
     def remove_batch(self):

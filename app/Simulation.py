@@ -2,11 +2,10 @@ import heapq
 from Batch import Batch
 from ProductionLine import ProductionLine
 from Event import Event 
+import matplotlib.pyplot as plt
 
 import random
-
 class Simulation:
-
     def divide_into_most_equal_sized_batches(self, total, batch_size):
         if batch_size < 20:
             batch_size = 20
@@ -41,20 +40,20 @@ class Simulation:
             initial_batches.append(Batch(id, batch_size))
         return initial_batches
 
-    def simulate(self):
+    
+    def simulate(self, batch_size):
         current_time = 0
         load_unload_time = 1
 
-        initial_batches = self.divide_into_random_size_batches(1000)
-
-        for batch in initial_batches:
-            print(batch)
+        #initial_batches = self.divide_into_random_sized_batches(1000)
+        initial_batches = self.divide_into_most_equal_sized_batches(1000, batch_size)
 
         production_line = ProductionLine()
 
         # Add initial batches to start buffer
         for batch in initial_batches:
             production_line.start_buffer.add_batch(batch)
+            print(batch,"size", batch.size)
 
         event_queue = []
 
@@ -68,9 +67,8 @@ class Simulation:
 
         # we keep the simulation going as long as there is events in the event queue
         while event_queue:
-            # print_event_queue(event_queue)
             event = heapq.heappop(event_queue)
-
+            
             current_time = event.time
             unit = event.unit
 
@@ -79,6 +77,8 @@ class Simulation:
                 if unit.load(current_time, production_line):
                     event = Event(unit.time_until_finished + load_unload_time, "unload", unit)
                     heapq.heappush(event_queue, event)
+
+
 
             # If the event action is unload we unload the task in the unit and add load events for all the units
             elif event.action == "unload":
@@ -90,14 +90,40 @@ class Simulation:
                 for unit in production_line.units:
                     event = Event(current_time + load_unload_time, "load", unit)
                     heapq.heappush(event_queue, event)
+            
+            #print_queue(event_queue)
+            #print_buffers(production_line)
+        
+        #print("batches: ", end="")
+        #for i in production_line.end_buffer.content:
+        #    print(i, end=", ")
+        #print()
 
-def print_event_queue(event_queue):
-    for event in event_queue:
+        return current_time
+    
+def print_queue(queue):
+    for event in queue:
         print(event, end=" ")
+    print()
+
+def print_buffers(production_line):
+    for buffer in production_line.buffers:
+        print(buffer.get_total_wafers(), end=" ")
     print()
 
 def main():
     sim = Simulation()
-    sim.simulate()
+    time = sim.simulate(42)
+    print(time) 
+    #x_values = list(range(20, 51))
+    #y_values = [sim.simulate(x) for x in x_values]
+#
+    #plt.plot(x_values, y_values)
+    #plt.xlabel('batch size')
+    #plt.ylabel('ticks')
+    #plt.grid(True)
+    #plt.show()
+
+    
 
 main()
