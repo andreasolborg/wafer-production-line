@@ -9,7 +9,7 @@ class Task:
 
         self.active_batch = None
 
-    def load(self, current_time, production_line):
+    def load(self, current_time, production_line, print_simulation):
         # A batch must be unloaded immidiatly after its processed so we must ensure its room in the outputbuffer when we unload it
         if not self.check_if_outputbuffer_has_space(current_time, production_line):
             return False
@@ -18,15 +18,17 @@ class Task:
         
         if self.active_batch: 
             time_until_finished = round(self.active_batch.size * self.time_per_wafer + current_time,1)
-            #print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
+            if print_simulation:
+                print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
             return time_until_finished
         
         return False  
 
-    def unload(self, current_time):
+    def unload(self, current_time, print_simulation):
         if self.active_batch:
             if self.outputbuffer.add_batch(self.active_batch):
-                #print("tick:", current_time, "---", self, self.active_batch, "unloaded")
+                if print_simulation:
+                    print("tick:", current_time, "---", self, self.active_batch, "unloaded")
                 self.active_batch = None
         
     def check_if_outputbuffer_has_space(self, current_time, production_line):

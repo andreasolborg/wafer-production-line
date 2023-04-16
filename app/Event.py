@@ -10,7 +10,4 @@ class Event:
     def __str__(self):
         return "[" + str(self.time) + "|" + str(self.action) + "|" + str(self.unit) + "]"
 
-def print_event_queue(event_queue):
-    for event in event_queue:
-        print(event, end=" ")
-    print()
+

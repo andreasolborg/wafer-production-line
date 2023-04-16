@@ -1,5 +1,5 @@
 import heapq
-from Batch import divide_into_most_equal_sized_batches, create_random_batches
+from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
@@ -8,28 +8,26 @@ from Batch import Batch
 
 class Simulation:
 
-
-    def bruteforce_initial_batches(self, production_line, iterations):
+    def try_to_find_new_best_initial_batches_with_bruteforce(self, iterations):
         best_time = None
         best_initial_batches = None
 
         for i in range(iterations):
             print(i)
-            initial_batches = create_random_batches(1000)
+            initial_batches = divide_into_random_sized_batches(1000)
             
-
-            time = self.simulate(ProductionLine(), initial_batches)
+            time = self.simulate(initial_batches, False)
         
-
             if best_time is None or time < best_time:
                 best_time = time
                 best_initial_batches = initial_batches
         
         best_time_from_file, initial_batches = self.get_last_batches_from_file("data/best_initial_batches.json")
 
-        print("best time", best_time)
+        print("No new best time found:", best_time, ">", best_time_from_file)
+
         if best_time < best_time_from_file:
-            print("New best time found: " + str(best_time))
+            print("New best time found:", best_time)
             self.save_batch_data_to_file(best_time, best_initial_batches, "data/best_initial_batches.json")
 
     def get_last_batches_from_file(self, file_path):
@@ -67,10 +65,10 @@ class Simulation:
             json.dump(file_data, outfile, indent=4)
 
 
-    def simulate(self, production_line, initial_batches):
+    def simulate(self, initial_batches, print_simulation=True):
         current_time = 0
         load_unload_time = 1
-
+        production_line = ProductionLine()
         # Add initial batches to start buffer
         for batch in initial_batches:
             production_line.start_buffer.add_batch(batch)
@@ -94,7 +92,7 @@ class Simulation:
 
             # If the event action is load we try to load the unit and if we succeed we add an unload event to a calculated future tick based on the task processing time and the batch size
             if event.action == "load":
-                if unit.load(current_time, production_line):
+                if unit.load(current_time, production_line, print_simulation):
                     event = Event(unit.time_until_finished + load_unload_time, "unload", unit)
                     heapq.heappush(event_queue, event)
 
@@ -102,7 +100,7 @@ class Simulation:
 
             # If the event action is unload we unload the task in the unit and add load events for all the units
             elif event.action == "unload":
-                unit.unload(current_time)
+                unit.unload(current_time, print_simulation)
                 # We really only need to add a load event for the unit that just unlaoded a task and the unit that got a new batch to one of its input buffers
                 # But its easier and dosent hurt to just add a load event for all units
                 # If a unit is busy the load event will just try to load the unit and fail
@@ -115,43 +113,13 @@ class Simulation:
     
 
 def main():
-    production_line = ProductionLine()
     sim = Simulation()
     
-    #initial_batches = divide_into_random_sized_batches(1000)
-    initial_batches = sim.get_last_batches_from_file("data.json")[1]
+    initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
 
-    sum = 0
-    for i in initial_batches:
-        sum += i.size
+    sim.simulate(initial_batches)
 
-    print(sum)
-
-
-    sim.simulate(production_line, initial_batches)
-
-
-    #sim.bruteforce_initial_batches(production_line, 1000)
-
-
-    #sim.save_batch_data_to_file(initial_batches, time, "data.json")
-    #high_score = 1000000
-    #for i in range(3000):
-    #    initial_batches = divide_into_random_sized_batches(1000)
-#
-    #    time = sim.simulate(production_line, initial_batches)
-    #    if time < high_score:
-    #        high_score = time
-    #        print("new high score: ", time)
-#
-    #x_values = list(range(0, len(initial_batches)))
-    #y_values = [batch.size for batch in initial_batches]
-###
-    #plt.plot(x_values, y_values)
-    #plt.xlabel('avgerage batch size')
-    #plt.ylabel('ticks')
-    #plt.show()
-#
+    sim.try_to_find_new_best_initial_batches_with_bruteforce(100)
     
 
 main()

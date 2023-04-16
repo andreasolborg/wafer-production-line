@@ -10,8 +10,6 @@ class Batch:
     def __str__(self):
         return "batch" + str(self.id)
     
-    
-
 def divide_into_most_equal_sized_batches(total, batch_size):
     if batch_size < 20:
         batch_size = 20
@@ -31,18 +29,19 @@ def divide_into_most_equal_sized_batches(total, batch_size):
         batches.append(Batch(num_batches + 1, remainder))
     return batches
 
-def recursive_split(total, min_value=20, max_value=50):
-    if total < 2 * min_value:
+def divide_into_random_sized_batches(total):
+    splitted_list = split_total_recursively_into_numbers_between_min_and_max(total)
+    batches = [Batch(i, splitted_list[i]) for i in range(len(splitted_list))]
+    return batches
+
+def split_total_recursively_into_numbers_between_min_and_max(total):
+    if total < 2 * 20:
         return [total]
     
-    split_point = random.randint(min_value, min(total - min_value, max_value))
-    first_part = recursive_split(split_point, min_value, max_value)
-    second_part = recursive_split(total - split_point, min_value, max_value)
+    split_point = random.randint(20, min(total - 20, 50))
+    first_part = split_total_recursively_into_numbers_between_min_and_max(split_point)
+    second_part = split_total_recursively_into_numbers_between_min_and_max(total - split_point)
     
     return first_part + second_part
 
-def create_random_batches(total):
-    random_numbers_list = recursive_split(total)
-    batches = [Batch(i, random_numbers_list[i]) for i in range(len(random_numbers_list))]
-    return batches
 
