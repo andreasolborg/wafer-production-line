@@ -18,7 +18,7 @@ class Task:
         
         if self.active_batch: 
             time_until_finished = round(self.active_batch.size * self.time_per_wafer + current_time,1)
-            print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
+            #print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
             return time_until_finished
         
         return False  
@@ -26,7 +26,7 @@ class Task:
     def unload(self, current_time):
         if self.active_batch:
             if self.outputbuffer.add_batch(self.active_batch):
-                print("tick:", current_time, "---", self, self.active_batch, "unloaded")
+                #print("tick:", current_time, "---", self, self.active_batch, "unloaded")
                 self.active_batch = None
         
     def check_if_outputbuffer_has_space(self, current_time, production_line):
@@ -40,7 +40,6 @@ class Task:
         
         potential_active_batch = self.inputbuffer.content[0]
 
-        print("hascapacity", self.outputbuffer.get_total_wafers(), potential_active_batch.size, self.outputbuffer.capacity)
         if self.outputbuffer.get_total_wafers() + potential_active_batch.size <= self.outputbuffer.capacity:
             return True 
         

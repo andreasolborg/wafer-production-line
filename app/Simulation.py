@@ -1,59 +1,79 @@
 import heapq
-from Batch import Batch
+from Batch import divide_into_most_equal_sized_batches, create_random_batches
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
+import json #TODO write command on how to install json
+from Batch import Batch
 
-import random
 class Simulation:
-    def divide_into_most_equal_sized_batches(self, total, batch_size):
-        if batch_size < 20:
-            batch_size = 20
-        elif batch_size > 50:
-            batch_size = 50
 
-        num_batches, remainder = divmod(total, batch_size)
-        batches = [Batch(i, batch_size) for i in range(1, num_batches + 1)]
 
-        if remainder > 0 and remainder < 20:
-            items_to_distribute = remainder
-            for batch in batches:
-                if items_to_distribute == 0:
-                    break
-                if batch.size < 50:
-                    batch.size += 1
-                    items_to_distribute -= 1
-        elif remainder >= 20:
-            batches.append(Batch(num_batches + 1, remainder))
+    def bruteforce_initial_batches(self, production_line, iterations):
+        best_time = None
+        best_initial_batches = None
 
-        return batches
+        for i in range(iterations):
+            print(i)
+            initial_batches = create_random_batches(1000)
+            
 
-    def divide_into_random_sized_batches(self, total):
-        # make batches of size between 20 and 50 for a total of 1000 batches
-        initial_batches = []
-        size_of_batches = 0
-        id = 0
-        while size_of_batches < total:
-            id += 1
-            batch_size = random.randint(20, 50)
-            size_of_batches += batch_size
-            initial_batches.append(Batch(id, batch_size))
-        return initial_batches
+            time = self.simulate(ProductionLine(), initial_batches)
+        
 
-    
-    def simulate(self, batch_size):
+            if best_time is None or time < best_time:
+                best_time = time
+                best_initial_batches = initial_batches
+        
+        best_time_from_file, initial_batches = self.get_last_batches_from_file("data/best_initial_batches.json")
+
+        print("best time", best_time)
+        if best_time < best_time_from_file:
+            print("New best time found: " + str(best_time))
+            self.save_batch_data_to_file(best_time, best_initial_batches, "data/best_initial_batches.json")
+
+    def get_last_batches_from_file(self, file_path):
+        with open(file_path, 'r') as infile:
+            file_data = json.load(infile)
+
+        if not file_data:
+            print("No data found in the file.")
+            return None
+
+        last_data = file_data[-1]  # Get the last JSON object
+        batch_list = [Batch(batch['id'], batch['size']) for batch in last_data['initial batches']]
+        time = last_data['time']
+
+        return time, batch_list
+
+    def save_batch_data_to_file(self, time, inital_batches, file_path):
+        data = {
+            "time": time,
+            "initial batches": [batch.to_dict() for batch in inital_batches]
+        }
+
+        # Check if the file exists and read its content
+        try:
+            with open(file_path, 'r') as infile:
+                file_data = json.load(infile)
+        except FileNotFoundError:
+            file_data = []
+
+        # Append the new data to the existing content
+        file_data.append(data)
+
+        # Save the updated content back to the file
+        with open(file_path, 'w') as outfile:
+            json.dump(file_data, outfile, indent=4)
+
+
+    def simulate(self, production_line, initial_batches):
         current_time = 0
         load_unload_time = 1
-
-        #initial_batches = self.divide_into_random_sized_batches(1000)
-        initial_batches = self.divide_into_most_equal_sized_batches(1000, batch_size)
-
-        production_line = ProductionLine()
 
         # Add initial batches to start buffer
         for batch in initial_batches:
             production_line.start_buffer.add_batch(batch)
-            print(batch,"size", batch.size)
 
         event_queue = []
 
@@ -90,40 +110,48 @@ class Simulation:
                 for unit in production_line.units:
                     event = Event(current_time + load_unload_time, "load", unit)
                     heapq.heappush(event_queue, event)
-            
-            #print_queue(event_queue)
-            #print_buffers(production_line)
-        
-        #print("batches: ", end="")
-        #for i in production_line.end_buffer.content:
-        #    print(i, end=", ")
-        #print()
 
         return current_time
     
-def print_queue(queue):
-    for event in queue:
-        print(event, end=" ")
-    print()
-
-def print_buffers(production_line):
-    for buffer in production_line.buffers:
-        print(buffer.get_total_wafers(), end=" ")
-    print()
 
 def main():
+    production_line = ProductionLine()
     sim = Simulation()
-    time = sim.simulate(42)
-    print(time) 
-    #x_values = list(range(20, 51))
-    #y_values = [sim.simulate(x) for x in x_values]
-#
-    #plt.plot(x_values, y_values)
-    #plt.xlabel('batch size')
-    #plt.ylabel('ticks')
-    #plt.grid(True)
-    #plt.show()
+    
+    #initial_batches = divide_into_random_sized_batches(1000)
+    initial_batches = sim.get_last_batches_from_file("data.json")[1]
 
+    sum = 0
+    for i in initial_batches:
+        sum += i.size
+
+    print(sum)
+
+
+    sim.simulate(production_line, initial_batches)
+
+
+    #sim.bruteforce_initial_batches(production_line, 1000)
+
+
+    #sim.save_batch_data_to_file(initial_batches, time, "data.json")
+    #high_score = 1000000
+    #for i in range(3000):
+    #    initial_batches = divide_into_random_sized_batches(1000)
+#
+    #    time = sim.simulate(production_line, initial_batches)
+    #    if time < high_score:
+    #        high_score = time
+    #        print("new high score: ", time)
+#
+    #x_values = list(range(0, len(initial_batches)))
+    #y_values = [batch.size for batch in initial_batches]
+###
+    #plt.plot(x_values, y_values)
+    #plt.xlabel('avgerage batch size')
+    #plt.ylabel('ticks')
+    #plt.show()
+#
     
 
 main()
