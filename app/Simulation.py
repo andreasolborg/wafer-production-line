@@ -208,7 +208,7 @@ def main():
     print("total time:", t)
 
     #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100)
 
 if __name__ == '__main__':
     main()
