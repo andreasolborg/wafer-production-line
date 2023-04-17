@@ -38,6 +38,23 @@ class Plot:
         plt.title('batch size for every batch number')
         plt.show()
 
+    def plot_speed_for_initial_batches(self):
+        sim = Simulation()
+        initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
+        
+        x_values = []
+        y_values = []
+
+        for i in range(len(initial_batches)):
+            x_values.append(i)
+            y_values.append(initial_batches[i].size)
+
+        plt.plot(x_values, y_values)
+        plt.xlabel('batch number')
+        plt.ylabel('batch size')
+        plt.title('batch size for every batch number')
+        plt.show()
+
 def main():
     plot = Plot()
     plot.plot_divide_into_most_equal_sized_batches()

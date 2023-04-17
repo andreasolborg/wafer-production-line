@@ -52,7 +52,6 @@ class Task:
             return True
         
         potential_active_batch = self.inputbuffer.content[0]
-        print(current_time, potential_active_batch, potential_active_batch.size)
 
         if self.outputbuffer.get_total_wafers() + potential_active_batch.size <= self.outputbuffer.capacity:
             return True 

@@ -1,12 +1,62 @@
 import heapq
-from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches, randomize_initial_batches
+from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches, divide_into_increasing_batch_sizes
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
 import json #TODO write command on how to install json
 from Batch import Batch
-
+import random
 class Simulation:
+
+
+
+    def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, iterations):
+        initial_population = []
+
+        # create 1000 random initial_batches lists
+        for s in range(1000):
+            initial_population.append(divide_into_random_sized_batches(1000))
+
+
+        for i in range(iterations):
+            initial_batches_with_time = []
+            
+            for initial_batches in initial_population:
+                initial_batches_with_time.append((self.simulate(initial_batches, False), initial_batches))
+            
+            initial_batches_with_time.sort(key=lambda tup: tup[0])
+
+            print("iteration:",i,",", initial_batches_with_time[0][0])
+
+            new_gen = []
+            
+            for tuple in initial_batches_with_time[100:]:
+                initial_batches = tuple[1]
+                initial_batches_sizes = [batch.size for batch in initial_batches]
+                new_gen.append(self.mutate_list(initial_batches_sizes))
+            
+            
+            new_gen_initial_batches = [[Batch(0, size) for size in sublist] for sublist in new_gen]   
+            initial_population = new_gen_initial_batches
+
+    def mutate_list(self, input_list):
+        result = input_list.copy()
+
+        # Ensure that index_down is different from index_up
+        while True:
+            index_up = random.randint(0, len(input_list) - 1)
+            index_down = random.randint(0, len(input_list) - 1)
+
+            if index_down == index_up:
+                continue
+            
+            if result[index_up] < 50 and result[index_down] > 20:
+                result[index_up] += 1
+                result[index_down] -= 1
+            else:
+                continue
+            break
+        return result
 
     def try_to_find_new_best_initial_batches_with_bruteforce(self, iterations):
         best_time = None
@@ -106,8 +156,7 @@ class Simulation:
             # If the event action is unload we unload the task in the unit and add load events for all the units
             elif event.action == "unload":
                 test = unit.unload(current_time, print_simulation)
-                if test:
-                    
+                if test and print_simulation: 
                    x_values.append(test[0])
                    total_size += test[1]
                    y_values.append(total_size) 
@@ -119,8 +168,20 @@ class Simulation:
                     event = Event(current_time + load_unload_time, "load", unit)
                     heapq.heappush(event_queue, event)
         
-        print(x_values)
-        print(y_values)
+    
+
+        if print_simulation:
+            fig,ax = plt.subplots()
+            ax.plot(x_values,y_values)
+            xticks = [x_values[len(x_values)//2], x_values[-1]]
+            yticks = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+            ax.set_xticks(xticks)
+
+            ax.set_yticks(yticks)
+            plt.xticks(fontsize=10)
+            plt.yticks(fontsize=10)
+            plt.show()
+            plt.close()
 
         return current_time
 
@@ -129,9 +190,13 @@ def main():
     
     initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
     #initial_batches = divide_into_most_equal_sized_batches(1000,20)
+    #initial_batches = divide_into_increasing_batch_sizes()
+
+
     sim.simulate(initial_batches)
 
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000)
-    
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100)
+
 if __name__ == '__main__':
     main()
