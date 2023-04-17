@@ -12,7 +12,7 @@ class Simulation:
 
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, iterations):
         initial_population = []
-
+        best_time_from_file, initial_batches = self.get_last_batches_from_file("data/best_initial_batches.json")
         # create 1000 random initial_batches lists
         for s in range(1000):
             initial_population.append(divide_into_random_sized_batches(1000))
@@ -26,8 +26,15 @@ class Simulation:
             
             initial_batches_with_time.sort(key=lambda tup: tup[0])
 
-            print("iteration:",i,",", initial_batches_with_time[0][0])
-            #print(i, len(initial_batches_with_time))
+            
+            
+            
+            print(str(i) + ": ", end="")
+            if initial_batches_with_time[0][0] < best_time_from_file:
+                print("New best time found:", initial_batches_with_time[0][0])
+                self.save_batch_data_to_file(initial_batches_with_time[0][0], initial_batches_with_time[0][1], "data/best_initial_batches.json")
+            else:
+                print("No new best time found:", initial_batches_with_time[0][0], ">", best_time_from_file)
 
             new_gen = []
             old_gen = []
