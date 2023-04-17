@@ -3,13 +3,10 @@ from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
-import json #TODO write command on how to install json
 from Batch import Batch
 import random
 import csv
 class Simulation:
-
-
 
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, iterations):
         initial_population = []
@@ -22,6 +19,9 @@ class Simulation:
         for i in range(iterations):
             initial_batches_with_time = []
             
+            for _ in range(700):
+                initial_population.append(divide_into_random_sized_batches(1000))
+
             for initial_batches in initial_population:
                 initial_batches_with_time.append((self.simulate(initial_batches, False), initial_batches))
             
@@ -35,22 +35,20 @@ class Simulation:
             else:
                 print("No new best time found:", initial_batches_with_time[0][0], ">", best_time_from_file)
 
-            new_gen = []
-            old_gen = []
+            top_100_mutaded = []
+            top_100_org = []
+
             for tuple in initial_batches_with_time[:100]:
                 initial_batches = tuple[1]
                 initial_batches_sizes = [batch.size for batch in initial_batches]
-                new_gen.append(self.mutate_list(initial_batches_sizes))
-            
-            for tuple in initial_batches_with_time[:900]:
-                initial_batches = tuple[1]
-                initial_batches_sizes = [batch.size for batch in initial_batches]
-                old_gen.append(initial_batches_sizes)
-            
-            keep = new_gen + old_gen
-            
-            new_gen_initial_batches = [[Batch(0, size) for size in sublist] for sublist in keep]   
+                top_100_mutaded.append(self.mutate_list(initial_batches_sizes))
+                top_100_org.append(initial_batches_sizes)
+
+            keep = top_100_mutaded + top_100_org
+             
+            new_gen_initial_batches = [[Batch(index+1, size) for index, size in enumerate(sublist)] for sublist in keep] 
             initial_population = new_gen_initial_batches
+
 
     def mutate_list(self, input_list):
         result = input_list.copy()
@@ -63,9 +61,9 @@ class Simulation:
             if index_down == index_up:
                 continue
             
-            if result[index_up] < 50 and result[index_down] > 20:
-                result[index_up] += 1
-                result[index_down] -= 1
+            if result[index_up] < 48 and result[index_down] > 22:
+                result[index_up] += 3
+                result[index_down] -= 3
             else:
                 continue
             break
@@ -188,14 +186,17 @@ class Simulation:
         for i in production_line.end_buffer.content:
             sum += i.size
         if sum == 1000:
-            print("all wafers confirmed in end buffer")
+            if print_simulation:
+                print("all wafers confirmed in end buffer")
+        else:
+            raise Exception("not all wafers in end buffer")
 
         return current_time
 
 def main():
     sim = Simulation()
     
-    #initial_batches = divide_into_most_equal_sized_batches(1000,20)
+    #initial_batches = divide_into_most_equal_sized_batches(1000,37)
 
     time, initial_batches = sim.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
     sum = 0
@@ -207,7 +208,7 @@ def main():
     print("total time:", t)
 
     #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
 
 if __name__ == '__main__':
     main()

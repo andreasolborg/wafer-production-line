@@ -16,14 +16,14 @@ class Plot:
             y_values.append(sim.simulate(initital_batches, False))
 
         plt.plot(x_values, y_values)
-        plt.xlabel('average batch sizes')
-        plt.ylabel('time until finished')
-        plt.title('time until finished for all different average batch sizes')
+        plt.xlabel("Average batch size")
+        plt.ylabel("Simulation time")
+        plt.title("1000 wafers splitted into most equal batch sizes possible and their simulation time")
         plt.show()
 
     def plot_best_initial_batches(self):
         sim = Simulation()
-        initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
+        initial_batches = sim.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")[1]
         
         x_values = []
         y_values = []
@@ -33,9 +33,9 @@ class Plot:
             y_values.append(initial_batches[i].size)
 
         plt.plot(x_values, y_values)
-        plt.xlabel('batch number')
-        plt.ylabel('batch size')
-        plt.title('batch size for every batch number')
+        plt.xlabel('Batch number')
+        plt.ylabel('Batch size')
+        plt.title('Batch size for every batch number')
         plt.show()
 
     def plot_speed_for_initial_batches(self):
