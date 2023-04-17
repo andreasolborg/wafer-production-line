@@ -24,7 +24,7 @@ class Unit:
         # A unit will never have two tasks with a active batch at the same time, since its illegal
         for task in self.tasks:
             if task.active_batch:
-                task.unload(current_time, print_simulation)
+                return task.unload(current_time, print_simulation)
 
     # This is the method implemented for choosing the next task for now
     def choose_next_task(self, current_time, production_line, print_simulation):

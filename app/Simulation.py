@@ -1,5 +1,5 @@
 import heapq
-from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches
+from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches, randomize_initial_batches
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
@@ -69,11 +69,16 @@ class Simulation:
         current_time = 0
         load_unload_time = 1
         production_line = ProductionLine()
+        
         # Add initial batches to start buffer
         for batch in initial_batches:
             production_line.start_buffer.add_batch(batch)
 
         event_queue = []
+
+        x_values = []
+        y_values = []
+        total_size = 0
 
         # Start the simulation by adding a load event for the first unit that has the first task
         event = Event(current_time + load_unload_time, "load", production_line.unit1)
@@ -100,7 +105,12 @@ class Simulation:
 
             # If the event action is unload we unload the task in the unit and add load events for all the units
             elif event.action == "unload":
-                unit.unload(current_time, print_simulation)
+                test = unit.unload(current_time, print_simulation)
+                if test:
+                    
+                   x_values.append(test[0])
+                   total_size += test[1]
+                   y_values.append(total_size) 
                 # We really only need to add a load event for the unit that just unlaoded a task and the unit that got a new batch to one of its input buffers
                 # But its easier and dosent hurt to just add a load event for all units
                 # If a unit is busy the load event will just try to load the unit and fail
@@ -108,18 +118,20 @@ class Simulation:
                 for unit in production_line.units:
                     event = Event(current_time + load_unload_time, "load", unit)
                     heapq.heappush(event_queue, event)
+        
+        print(x_values)
+        print(y_values)
 
         return current_time
-    
 
 def main():
     sim = Simulation()
     
     initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
-
+    #initial_batches = divide_into_most_equal_sized_batches(1000,20)
     sim.simulate(initial_batches)
 
-    sim.try_to_find_new_best_initial_batches_with_bruteforce(100)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000)
     
-
-main()
+if __name__ == '__main__':
+    main()

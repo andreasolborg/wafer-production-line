@@ -44,4 +44,24 @@ def split_total_recursively_into_numbers_between_min_and_max(total):
     
     return first_part + second_part
 
+def randomize_initial_batches(initial_batches):
+    total = 1000
+    lst = [batch.size for batch in initial_batches]
+    new_lst = []
+
+    for i in range(len(lst)):
+        # calculate the target value for the current element
+        target_value = (total / len(lst))
+        # add a random deviation from the target value to the current element
+        deviation = random.uniform(-0.1, 0.1) * target_value
+        new_value = round(lst[i] + deviation)
+        # ensure the new value is within a reasonable range (>= 1)
+        new_value = max(1, new_value)
+        # add the new value to the new list
+        new_lst.append(new_value)
+        # adjust the total to account for the change in the current element
+        total -= lst[i]
+        total += new_value
+
+    return [Batch(i, new_lst[i]) for i in range(len(new_lst))]
 
