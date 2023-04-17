@@ -27,16 +27,23 @@ class Simulation:
             initial_batches_with_time.sort(key=lambda tup: tup[0])
 
             print("iteration:",i,",", initial_batches_with_time[0][0])
+            #print(i, len(initial_batches_with_time))
 
             new_gen = []
-            
-            for tuple in initial_batches_with_time[100:]:
+            old_gen = []
+            for tuple in initial_batches_with_time[:100]:
                 initial_batches = tuple[1]
                 initial_batches_sizes = [batch.size for batch in initial_batches]
                 new_gen.append(self.mutate_list(initial_batches_sizes))
             
+            for tuple in initial_batches_with_time[:900]:
+                initial_batches = tuple[1]
+                initial_batches_sizes = [batch.size for batch in initial_batches]
+                old_gen.append(initial_batches_sizes)
             
-            new_gen_initial_batches = [[Batch(0, size) for size in sublist] for sublist in new_gen]   
+            keep = new_gen + old_gen
+            
+            new_gen_initial_batches = [[Batch(0, size) for size in sublist] for sublist in keep]   
             initial_population = new_gen_initial_batches
 
     def mutate_list(self, input_list):
@@ -193,10 +200,10 @@ def main():
     #initial_batches = divide_into_increasing_batch_sizes()
 
 
-    sim.simulate(initial_batches)
+    #sim.simulate(initial_batches)
 
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
 
 if __name__ == '__main__':
     main()
