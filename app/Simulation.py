@@ -6,13 +6,14 @@ import matplotlib.pyplot as plt
 import json #TODO write command on how to install json
 from Batch import Batch
 import random
+import csv
 class Simulation:
 
 
 
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, iterations):
         initial_population = []
-        best_time_from_file, initial_batches = self.get_last_batches_from_file("data/best_initial_batches.json")
+        best_time_from_file, initial_batches = self.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
         # create 1000 random initial_batches lists
         for s in range(1000):
             initial_population.append(divide_into_random_sized_batches(1000))
@@ -27,12 +28,10 @@ class Simulation:
             initial_batches_with_time.sort(key=lambda tup: tup[0])
 
             
-            
-            
             print(str(i) + ": ", end="")
             if initial_batches_with_time[0][0] < best_time_from_file:
                 print("New best time found:", initial_batches_with_time[0][0])
-                self.save_batch_data_to_file(initial_batches_with_time[0][0], initial_batches_with_time[0][1], "data/best_initial_batches.json")
+                self.save_initial_batches_with_time_as_csv(initial_batches_with_time[0][0], initial_batches_with_time[0][1], "data/best_initial_batches.csv")
             else:
                 print("No new best time found:", initial_batches_with_time[0][0], ">", best_time_from_file)
 
@@ -86,48 +85,36 @@ class Simulation:
                 best_time = time
                 best_initial_batches = initial_batches
         
-        best_time_from_file, initial_batches = self.get_last_batches_from_file("data/best_initial_batches.json")
-
-        print("No new best time found:", best_time, ">", best_time_from_file)
+        best_time_from_file, initial_batches = self.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
 
         if best_time < best_time_from_file:
             print("New best time found:", best_time)
-            self.save_batch_data_to_file(best_time, best_initial_batches, "data/best_initial_batches.json")
+            self.save_initial_batches_with_time_as_csv(best_time, best_initial_batches, "data/best_initial_batches.csv")
+        else:
+            print("No new best time found:", best_time, ">", best_time_from_file)
 
-    def get_last_batches_from_file(self, file_path):
-        with open(file_path, 'r') as infile:
-            file_data = json.load(infile)
+    def save_initial_batches_with_time_as_csv(self, time, inital_batches, file_path):
+        with open(file_path, "a", newline="") as file:
+            writer = csv.writer(file)
+            row = [time] + [batch.size for batch in inital_batches]
+            writer.writerow(row)
+    
+    def get_best_initial_batches_from_csv_file(self, file_path):
+        with open(file_path, 'r') as file:
+            reader = csv.reader(file)
+            rows = list(reader)
+            if len(rows) == 0:
+                return 999999999, None
+            
+            last_row = rows[-1]
+            initial_batches = []
+            time = float(last_row[0])
+            for i in range(1, len(last_row)):
+                initial_batches.append(Batch(i, int(last_row[i])))
 
-        if not file_data:
-            print("No data found in the file.")
-            return None
+            return time, initial_batches
 
-        last_data = file_data[-1]  # Get the last JSON object
-        batch_list = [Batch(batch['id'], batch['size']) for batch in last_data['initial batches']]
-        time = last_data['time']
-
-        return time, batch_list
-
-    def save_batch_data_to_file(self, time, inital_batches, file_path):
-        data = {
-            "time": time,
-            "initial batches": [batch.to_dict() for batch in inital_batches]
-        }
-
-        # Check if the file exists and read its content
-        try:
-            with open(file_path, 'r') as infile:
-                file_data = json.load(infile)
-        except FileNotFoundError:
-            file_data = []
-
-        # Append the new data to the existing content
-        file_data.append(data)
-
-        # Save the updated content back to the file
-        with open(file_path, 'w') as outfile:
-            json.dump(file_data, outfile, indent=4)
-
+   
 
     def simulate(self, initial_batches, print_simulation=True):
         current_time = 0
@@ -196,21 +183,31 @@ class Simulation:
             plt.yticks(fontsize=10)
             plt.show()
             plt.close()
+        
+        sum = 0
+        for i in production_line.end_buffer.content:
+            sum += i.size
+        if sum == 1000:
+            print("all wafers confirmed in end buffer")
 
         return current_time
 
 def main():
     sim = Simulation()
     
-    initial_batches = sim.get_last_batches_from_file("data/best_initial_batches.json")[1]
     #initial_batches = divide_into_most_equal_sized_batches(1000,20)
-    #initial_batches = divide_into_increasing_batch_sizes()
 
+    time, initial_batches = sim.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
+    sum = 0
+    for i in initial_batches:
+        sum += i.size
+    print("sum:", sum)
 
-    #sim.simulate(initial_batches)
+    t = sim.simulate(initial_batches)
+    print("total time:", t)
 
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(11)
 
 if __name__ == '__main__':
     main()
