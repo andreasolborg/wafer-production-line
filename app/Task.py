@@ -30,14 +30,15 @@ class Task:
     def unload(self, current_time, print_simulation):
         if self.active_batch:
             if self.outputbuffer.add_batch(self.active_batch):
-                active_batch_copy = copy.copy(self.active_batch)
-                self.active_batch = None
                 
                 if print_simulation:
-                    print("tick:", current_time, "---", self, active_batch_copy, "unloaded")
-                    
+                    print("tick:", current_time, "---", self, self.active_batch, "unloaded")
+                
+                active_batch_copy = copy.copy(self.active_batch)
+                self.active_batch = None
+
                 if self.outputbuffer.capacity == math.inf:
-                    return current_time, active_batch_copy.size
+                    return active_batch_copy.size
 
         
     def check_if_outputbuffer_has_space(self, current_time, production_line):
