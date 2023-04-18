@@ -152,7 +152,7 @@ class Simulation:
         print("Best permutation      : " + str(best_permutation) + ", time = " + str(best_time))
         print()
 
-    # The format:
+    # The csv format:
     # 1,3,6,9,5,7,2,4,8,5591.6,20,20,35,27,21,22,32,34,45,37,40,25,20,38,33,27,27,42,21,28,33,38,29,24,23,22,28,24,22,32,29,20,20,21,21,20
     # The frirst 10 numbers are the task order, the next number is the time, and the rest are the initial batch sizes
     def save_initial_batches_with_time_and_task_task_prioritization_as_csv(self, time, inital_batches, task_order, file_path):
@@ -261,9 +261,6 @@ class Simulation:
             plt.show()
             plt.close()
         
-        #sum = 0
-        #for i in production_line.end_buffer.content:
-        #    sum += i.size
         if total_size == AMOUNT_OF_WAFERS:
             if print_simulation:
                 print("All wafers confirmed in end buffer")
@@ -273,20 +270,21 @@ class Simulation:
         
         if print_simulation:
             print()
-            
+
         return current_time
 
 def main():
     sim = Simulation()
     
-    #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
+    
 
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
+    #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
     sim.simulate(initial_batches, task_prioritization, True)
-    sim.try_all_task_prioritization(initial_batches)
-    sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
+    #sim.try_all_task_prioritization(initial_batches)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100, task_prioritization)
 
 if __name__ == '__main__':
     main()
