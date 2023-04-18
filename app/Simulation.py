@@ -1,9 +1,8 @@
 import heapq
-from Batch import divide_into_most_equal_sized_batches, divide_into_random_sized_batches, divide_into_increasing_batch_sizes
+from Batch import Batch, divide_into_most_equal_sized_batches, divide_into_random_sized_batches
 from ProductionLine import ProductionLine
 from Event import Event 
 import matplotlib.pyplot as plt
-from Batch import Batch
 import random
 import csv
 class Simulation:
@@ -11,12 +10,12 @@ class Simulation:
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, iterations):
         initial_population = []
         best_time_from_file, initial_batches = self.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
-        # create 1000 random initial_batches lists
+       
         for s in range(1000):
             initial_population.append(divide_into_random_sized_batches(1000))
 
-
         for i in range(iterations):
+            print("generation " + str(i + 1))
             initial_batches_with_time = []
             
             for _ in range(700):
@@ -28,7 +27,6 @@ class Simulation:
             initial_batches_with_time.sort(key=lambda tup: tup[0])
 
             
-            print(str(i) + ": ", end="")
             if initial_batches_with_time[0][0] < best_time_from_file:
                 print("New best time found:", initial_batches_with_time[0][0])
                 self.save_initial_batches_with_time_as_csv(initial_batches_with_time[0][0], initial_batches_with_time[0][1], "data/best_initial_batches.csv")
@@ -48,7 +46,6 @@ class Simulation:
              
             new_gen_initial_batches = [[Batch(index+1, size) for index, size in enumerate(sublist)] for sublist in keep] 
             initial_population = new_gen_initial_batches
-
 
     def mutate_list(self, input_list):
         result = input_list.copy()
@@ -74,7 +71,7 @@ class Simulation:
         best_initial_batches = None
 
         for i in range(iterations):
-            print(i)
+            print("iteration " + str(i + 1))
             initial_batches = divide_into_random_sized_batches(1000)
             
             time = self.simulate(initial_batches, False)
@@ -111,8 +108,6 @@ class Simulation:
                 initial_batches.append(Batch(i, int(last_row[i])))
 
             return time, initial_batches
-
-   
 
     def simulate(self, initial_batches, print_simulation=True):
         current_time = 0
@@ -187,9 +182,10 @@ class Simulation:
             sum += i.size
         if sum == 1000:
             if print_simulation:
-                print("all wafers confirmed in end buffer")
+                print("All wafers confirmed in end buffer")
+                print("Total time:", current_time)
         else:
-            raise Exception("not all wafers in end buffer")
+            raise Exception("Not all wafers in end buffer")
 
         return current_time
 
@@ -199,15 +195,10 @@ def main():
     #initial_batches = divide_into_most_equal_sized_batches(1000,37)
 
     time, initial_batches = sim.get_best_initial_batches_from_csv_file("data/best_initial_batches.csv")
-    sum = 0
-    for i in initial_batches:
-        sum += i.size
-    print("sum:", sum)
 
-    t = sim.simulate(initial_batches)
-    print("total time:", t)
+    sim.simulate(initial_batches)
 
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(10000)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000)
     #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100)
 
 if __name__ == '__main__':

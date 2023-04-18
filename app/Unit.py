@@ -1,12 +1,9 @@
 class Unit:
     def __init__(self, id, tasks):
         self.id = id
-        # Prioritize the tasks by time per wafer
+        # Prioritize the tasks by time per wafer, we want to do the fastest tasks first
         self.tasks = sorted(tasks, key=lambda task: task.time_per_wafer, reverse=False)
         self.time_until_finished = 0
-        #for i in self.tasks:
-        #    print(i.time_per_wafer, end=" ")
-        #print()
 
     #def prior(self):
     #    self.tasks = sorted(self.tasks, key=lambda task: task.inputbuffer.get_total_wafers(), reverse=True)

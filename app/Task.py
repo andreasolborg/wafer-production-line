@@ -20,9 +20,7 @@ class Task:
         self.active_batch = self.inputbuffer.remove_batch()
         
         if self.active_batch: 
-            #time_until_finished = round(self.active_batch.size * self.time_per_wafer + current_time,1)
             time_until_finished = math.ceil((self.active_batch.size * self.time_per_wafer + current_time) * 10) / 10
-            #time_until_finished = self.active_batch.size * self.time_per_wafer + current_time
             if print_simulation:
                 print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
             return time_until_finished
