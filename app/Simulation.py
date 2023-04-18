@@ -19,18 +19,14 @@ class Simulation:
         initial_population = []
         
         # We want to take all our best initial batches and add them to the population
-        all_initial_batches_from_file = self.get_all_initial_batches_from_csv_file("data/best_initial_batches.csv")
+        #all_initial_batches_from_file = self.get_all_initial_batches_from_csv_file("data/best_initial_batches.csv")
         
         # We create 400 random initial batches and add them to the population
         for _ in range(500):
             initial_population.append(divide_into_random_sized_batches(AMOUNT_OF_WAFERS))
         
-        # We create 300 different equal sized initial batches 
-        for _ in range(10):
-            for size in range(21, 50):
-                initial_population.append(divide_into_most_equal_sized_batches(AMOUNT_OF_WAFERS, size))
         
-        initial_population.extend(all_initial_batches_from_file)
+        #initial_population.extend(all_initial_batches_from_file)
 
         for i in range(generations):
             print("----- Generation " + str(i + 1), "-----")
@@ -58,6 +54,8 @@ class Simulation:
                 self.save_initial_batches_with_time_and_task_task_prioritization_as_csv(initial_batches_and_their_simulation_time[0][0], initial_batches_and_their_simulation_time[0][1], task_prioritization, "data/best_initial_batches.csv")
             else:
                 print("No new best time found:", initial_batches_and_their_simulation_time[0][0], ">=", best_time_from_file)
+                print("Best initial batches this generation:", [batch.size for batch in initial_batches_and_their_simulation_time[0][1]])
+
 
             top_100_mutaded = []
             top_100_original = []
@@ -281,10 +279,10 @@ def main():
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
-    sim.simulate(initial_batches, task_prioritization, True)
+    #sim.simulate(initial_batches, task_prioritization, True)
     #sim.try_all_task_prioritization(initial_batches)
     #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100, task_prioritization)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100, task_prioritization)
 
 if __name__ == '__main__':
     main()
