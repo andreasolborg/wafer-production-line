@@ -285,7 +285,7 @@ class Simulation:
         
         if total_size == AMOUNT_OF_WAFERS:
             if print_simulation:
-                with open("simulation.tsv", "a") as file:
+                with open("data/simulation.tsv", "a") as file:
                     file.write(str(current_time) + "\tNone\tNone\tComplete\t"+str(current_time))
                 print("All wafers confirmed in end buffer")
                 print("Total time:", current_time)
@@ -302,7 +302,7 @@ def main():
     sim = Simulation()
     
     #clear simulation.tsv file
-    file = open("simulation.tsv", "w")
+    file = open("data/simulation.tsv", "w")
     file.close()
     
 
