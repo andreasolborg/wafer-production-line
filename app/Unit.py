@@ -13,7 +13,7 @@ class Unit:
         # Check if the unit is locked to a ongoing task
         #self.prior()
         if current_time >= self.time_until_finished:
-            return self.choose_next_task(current_time, production_line, print_simulation)
+            return self.choose_next_task(current_time, print_simulation)
         # We return false if we dont find any task with something in the input buffer
         return False
 
@@ -25,11 +25,11 @@ class Unit:
                 return task.unload(current_time, print_simulation)
 
     # This is the method implemented for choosing the next task for now
-    def choose_next_task(self, current_time, production_line, print_simulation):
+    def choose_next_task(self, current_time, print_simulation):
         # We simply take the first task in the unit that has something in the input buffer
         for task in self.tasks:
             if task.inputbuffer.content:
-                time_until_finished = task.load(current_time, production_line, print_simulation)
+                time_until_finished = task.load(current_time, print_simulation)
                 if time_until_finished:
                     self.time_until_finished = time_until_finished
                     return True

@@ -9,12 +9,12 @@ class Task:
 
         self.active_batch = None
 
-    def load(self, current_time, production_line, print_simulation):
+    def load(self, current_time, print_simulation):
         # A batch must be unloaded immidiatly after its processed so we must ensure its room in the outputbuffer when we unload it
         if self.active_batch:
             return False
         
-        if not self.check_if_outputbuffer_has_space(current_time, production_line):
+        if not self.check_if_outputbuffer_has_space():
             return False
 
         self.active_batch = self.inputbuffer.remove_batch()
@@ -41,7 +41,7 @@ class Task:
                     return active_batch_copy.size
 
         
-    def check_if_outputbuffer_has_space(self, current_time, production_line):
+    def check_if_outputbuffer_has_space(self):
         # If the outputbuffer has infinite capacity it means it is the end buffer and we return True
         if self.outputbuffer.capacity == math.inf:
             return True

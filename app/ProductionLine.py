@@ -28,25 +28,8 @@ class ProductionLine:
             9: Task(9, 0.3, self.buffer9, self.end_buffer),
         }
 
-        #self.units = [
-        #    Unit(i + 1, [self.tasks[task_id] for task_id in unit_tasks])
-        #    for i, unit_tasks in enumerate(task_order)
-        #]
-
-        #self.task1 = Task(1, 0.5, self.start_buffer, self.buffer2)
-        #self.task2 = Task(2, 3.5, self.buffer2, self.buffer3)
-        #self.task3 = Task(3, 1.2, self.buffer3, self.buffer4)
-        #self.task4 = Task(4, 3.0, self.buffer4, self.buffer5)
-        #self.task5 = Task(5, 0.8, self.buffer5, self.buffer6)
-        #self.task6 = Task(6, 0.5, self.buffer6, self.buffer7)
-        #self.task7 = Task(7, 1.0, self.buffer7, self.buffer8)
-        #self.task8 = Task(8, 1.9, self.buffer8, self.buffer9)
-        #self.task9 = Task(9, 0.3, self.buffer9, self.end_buffer)
-
         self.unit1 = Unit(1, [self.tasks[task_id] for task_id in task_order[0]])
         self.unit2 = Unit(2, [self.tasks[task_id] for task_id in task_order[1]])
         self.unit3 = Unit(3, [self.tasks[task_id] for task_id in task_order[2]])
 
         self.units = [self.unit1, self.unit2, self.unit3]
-
-        #self.buffers = [self.start_buffer, self.buffer2, self.buffer3, self.buffer4, self.buffer5, self.buffer6, self.buffer7, self.buffer8, self.buffer9, self.end_buffer]    
