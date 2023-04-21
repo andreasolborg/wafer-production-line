@@ -11,12 +11,11 @@ import copy
 AMOUNT_OF_WAFERS = 1000
 class Simulation:
     
-    
     def try_to_find_new_best_timeout_between_batches(self, initial_batches, task_prioritization):
         best_time = None
         best_timeout = None
         for i in range(1, 50):
-            time =  self.simulate(initial_batches, task_prioritization, i, False)
+            time = self.simulate(initial_batches, task_prioritization, i, False)
             print("Timeout between batches:" + str(i) + ", time = " + str(time))
 
             if best_time is None or time < best_time:
@@ -27,7 +26,7 @@ class Simulation:
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, generations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH GENETIC ALGORITHM ##")
         
-        best_time_from_file, initial_batches_from_file, task_prioritization_from_file = self.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
+        best_time_from_file, initial_batches_from_file, task_prioritization_from_file, timeout = self.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
         
         initial_population = []
         
@@ -64,7 +63,7 @@ class Simulation:
             if initial_batches_and_their_simulation_time[0][0] < best_time_from_file:
                 print("New best time found:   ", initial_batches_and_their_simulation_time[0][0])
                 best_time_from_file = initial_batches_and_their_simulation_time[0][0]
-                self.save_initial_batches_with_time_and_task_task_prioritization_as_csv(initial_batches_and_their_simulation_time[0][0], initial_batches_and_their_simulation_time[0][1], task_prioritization, "data/best_initial_batches.csv")
+                self.save_initial_batches_with_time_and_task_prioritization_and_timeout_as_csv(initial_batches_and_their_simulation_time[0][0], initial_batches_and_their_simulation_time[0][1], task_prioritization, timeout_between_adding_batches_to_start_buffer, "data/best_initial_batches.csv")
             else:
                 print("No new best time found:", initial_batches_and_their_simulation_time[0][0], ">=", best_time_from_file)
                 print("Best initial batches this generation:", [batch.size for batch in initial_batches_and_their_simulation_time[0][1]])
@@ -110,7 +109,7 @@ class Simulation:
 
     def try_to_find_new_best_initial_batches_with_bruteforce(self, iterations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH BRUTEFORCE ##")
-        best_time_from_file, initial_batches_from_file, task_prioritization_from_file = self.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
+        best_time_from_file, initial_batches_from_file, task_prioritization_from_file, timeout = self.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
         
         best_time = None
         best_initial_batches = None
@@ -127,7 +126,7 @@ class Simulation:
 
         if best_time < best_time_from_file:
             print("New best time found:   ", best_time)
-            self.save_initial_batches_with_time_and_task_task_prioritization_as_csv(best_time, best_initial_batches, task_prioritization, "data/best_initial_batches.csv")
+            self.save_initial_batches_with_time_and_task_prioritization_and_timeout_as_csv(best_time, best_initial_batches, task_prioritization, timeout_between_adding_batches_to_start_buffer, "data/best_initial_batches.csv")
         else:
             print("No new best time found:", best_time, ">=", best_time_from_file)
         
@@ -166,10 +165,10 @@ class Simulation:
     # The csv format:
     # 1,3,6,9,5,7,2,4,8,5591.6,20,20,35,27,21,22,32,34,45,37,40,25,20,38,33,27,27,42,21,28,33,38,29,24,23,22,28,24,22,32,29,20,20,21,21,20
     # The frirst 10 numbers are the task order, the next number is the time, and the rest are the initial batch sizes
-    def save_initial_batches_with_time_and_task_task_prioritization_as_csv(self, time, inital_batches, task_order, file_path):
+    def save_initial_batches_with_time_and_task_prioritization_and_timeout_as_csv(self, time, inital_batches, task_order, timeout, file_path):
         with open(file_path, "a", newline="") as file:
             writer = csv.writer(file)
-            row = list(itertools.chain.from_iterable(task_order)) + [time] + [batch.size for batch in inital_batches]
+            row = list(itertools.chain.from_iterable(task_order)) + [time] + [timeout] + [batch.size for batch in inital_batches]
             writer.writerow(row)
     
     def get_all_initial_batches_from_csv_file(self, file_path):
@@ -181,13 +180,13 @@ class Simulation:
             all_initial_batches = []
             for row in rows:
                 initial_batches = []
-                for i in range(10, len(row)):
+                for i in range(11, len(row)):
                     initial_batches.append(Batch(i-9, int(row[i])))
                 all_initial_batches.append(initial_batches)
 
             return all_initial_batches
 
-    def get_best_initial_batches_with_time_and_task_prioritization_from_csv_file(self, file_path):
+    def get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file(self, file_path):
         with open(file_path, 'r') as file:
             reader = csv.reader(file)
             rows = list(reader)
@@ -197,11 +196,12 @@ class Simulation:
             last_row = rows[-1]
             initial_batches = []
             time = float(last_row[9])
+            timeout = int(last_row[10])
             task_order = [[int(last_row[0]), int(last_row[1]), int(last_row[2]), int(last_row[3])], [int(last_row[4]), int(last_row[5]), int(last_row[6])], [int(last_row[7]), int(last_row[8])]]
-            for i in range(10, len(last_row)):
+            for i in range(11, len(last_row)):
                 initial_batches.append(Batch(i-9, int(last_row[i])))
 
-            return time, initial_batches, task_order
+            return time, initial_batches, task_order, timeout
         
     def simulate(self, initial_batches, task_prioritization, timeout_between_adding_batches_to_start_buffer, print_simulation=True):
         
@@ -232,8 +232,11 @@ class Simulation:
         # the heapq is sorted on the attribute time
         #heapq.heappush(event_queue, event)
 
+        
+        event = Event(0, "load_to_start_buffer", None)
+        heapq.heappush(event_queue, event)
 
-        for i in range(len(initial_batches)):
+        for i in range(0, len(initial_batches)-1):
             event = Event(i + timeout_between_adding_batches_to_start_buffer, "load_to_start_buffer", None)
             heapq.heappush(event_queue, event)
 #
@@ -318,14 +321,14 @@ def main():
     file = open("data/simulation.tsv", "w")
     file.close()
     
-    time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
+    time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
-    sim.simulate(initial_batches, task_prioritization,  50, True)
-    sim.try_to_find_new_best_timeout_between_batches(initial_batches, task_prioritization)
+    sim.simulate(initial_batches, task_prioritization,  timeout, True)
+    #sim.try_to_find_new_best_timeout_between_batches(initial_batches, task_prioritization)
     #sim.try_all_task_prioritization(initial_batches, 50)
     #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization, 50)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization, 50)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, timeout)
 
 if __name__ == '__main__':
     main()
