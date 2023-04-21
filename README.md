@@ -86,5 +86,4 @@ A load event is only going to be sucessfull if a unit is free and can take a new
 Our simulate function takes in the following parameters: initial_batches (the 1000 wafers splitted into batches), task_prioritization (a 2d list of the task prioritized) and print_simulation (boolean for printing or not). The first that happens in our funtion is that we add the initial batches to the first buffer. We gave this buffer infinity capacaty since the simulation time was not going to get affected by it. So when all the buffers are loaded to the first buffer we start the simulation by adding a load event for the first unit that has the first task. We then go into a loop that runs while the event_queue has event in it. This list is always sorted by our heapq functionality. Since a load event will add a unload event to the event_queue and a unload event will add a load event to the event_queue our simulation will run until all batches are in the end buffer. The end buffer also has infite capacity. We can then check the time when the simualtion stopped and know how long it took.
 
 ### Task 4
-
-TODO
+The simulation is written to a tsv file, and works by writing a line everytime an Action/Event is triggered on a Task object. The file is called simulation.tsv and is located in the data folder.
