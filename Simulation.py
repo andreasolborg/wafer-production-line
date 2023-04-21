@@ -10,6 +10,19 @@ import copy
 
 AMOUNT_OF_WAFERS = 1000
 class Simulation:
+    
+    
+    def try_to_find_new_best_timeout_between_batches(self, initial_batches, task_prioritization):
+        best_time = None
+        best_timeout = None
+        for i in range(1, 50):
+            time =  self.simulate(initial_batches, task_prioritization, i, False)
+            print("Timeout between batches:" + str(i) + ", time = " + str(time))
+
+            if best_time is None or time < best_time:
+                best_time = time
+                best_timeout = i
+        print(best_timeout)
 
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, generations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH GENETIC ALGORITHM ##")
@@ -195,12 +208,12 @@ class Simulation:
         if print_simulation:
             print("## SIMULATING ONE CASE WITH PRINT ##")
 
-
         current_time = 0
         load_unload_time = 1
         production_line = ProductionLine(task_prioritization)
-        initial_batches = copy.deepcopy(initial_batches)
-
+        
+        #initial_batches = copy.deepcopy(initial_batches)
+        next_batch_to_be_added = 0
         # Add initial batches to start buffer
         #for batch in initial_batches:
         #    production_line.start_buffer.add_batch(batch)
@@ -256,11 +269,11 @@ class Simulation:
                     heapq.heappush(event_queue, event)
             
             elif event.action == "load_to_start_buffer":
-                batch_to_be_popped = initial_batches[0]
+                batch_to_be_popped = initial_batches[next_batch_to_be_added]
                 if production_line.start_buffer.add_batch(batch_to_be_popped):
-                    popped = initial_batches.pop(0)
+                    next_batch_to_be_added += 1
                     if print_simulation:
-                        print("tick:", current_time, "---", popped, "loaded to start buffer")
+                        print("tick:", current_time, "---", next_batch_to_be_added, "loaded to start buffer")
                     for unit in production_line.units:
                         event = Event(current_time + load_unload_time, "load", unit)
                         heapq.heappush(event_queue, event)
@@ -305,14 +318,14 @@ def main():
     file = open("data/simulation.tsv", "w")
     file.close()
     
-
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
-    sim.simulate(initial_batches, task_prioritization,  1, True)
-    sim.try_all_task_prioritization(initial_batches, 1)
-    sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization, 1)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization, 1)
+    sim.simulate(initial_batches, task_prioritization,  50, True)
+    sim.try_to_find_new_best_timeout_between_batches(initial_batches, task_prioritization)
+    #sim.try_all_task_prioritization(initial_batches, 50)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization, 50)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization, 50)
 
 if __name__ == '__main__':
     main()
