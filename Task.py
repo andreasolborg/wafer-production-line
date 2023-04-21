@@ -10,21 +10,15 @@ class Task:
 
 
     def write_to_file(self, current_time, time_until_finished=None, action=None):
-        with open("simulation.tsv", "a") as file:
+        with open("data/simulation.tsv", "a") as file:
             if file.tell() == 0:  # Check if file is empty
                 # Write header
                 file.write("Tick\tTask\tBatch\tAction\tFinish Time\tOutputbuffer Size\n")
             if action == "load":
                 # If output buffer has no content and does not have infinite capacity, 
-                if not self.outputbuffer.content or self.outputbuffer.capacity == math.inf:
-                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tLOADED\t{time_until_finished:.1f}\n"
-                elif self.outputbuffer.capacity != math.inf:
-                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tLOADED\t{time_until_finished:.1f}\t{self.outputbuffer.get_total_wafers()}\n"
+                line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tLOAD\t{time_until_finished:.1f}\t{self.outputbuffer.get_total_wafers()}\n"
             elif action == "unload":
-                if not self.outputbuffer.content or self.outputbuffer.capacity == math.inf:
-                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tUNLOADED\n"
-                elif self.outputbuffer.capacity != math.inf:
-                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tUNLOADED\t{self.outputbuffer.get_total_wafers()}\n"
+                line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tUNLOAD\t{self.outputbuffer.get_total_wafers()}\n"
             file.write(line)
 
 
