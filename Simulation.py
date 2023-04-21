@@ -11,7 +11,7 @@ import copy
 AMOUNT_OF_WAFERS = 1000
 class Simulation:
 
-    def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, generations, task_prioritization):
+    def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, generations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH GENETIC ALGORITHM ##")
         
         best_time_from_file, initial_batches_from_file, task_prioritization_from_file = self.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
@@ -40,7 +40,7 @@ class Simulation:
             # We want to simulate all the initial batches in the population and add them to a list with their time
             for initial_batches in initial_population:
 
-                initial_batches_and_their_simulation_time.append((self.simulate(initial_batches, task_prioritization , False), initial_batches))
+                initial_batches_and_their_simulation_time.append((self.simulate(initial_batches, task_prioritization , timeout_between_adding_batches_to_start_buffer, False), initial_batches))
             
             # We sort the list by time
             initial_batches_and_their_simulation_time.sort(key=lambda tup: tup[0])
@@ -95,7 +95,7 @@ class Simulation:
 
         return result
 
-    def try_to_find_new_best_initial_batches_with_bruteforce(self, iterations, task_prioritization):
+    def try_to_find_new_best_initial_batches_with_bruteforce(self, iterations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH BRUTEFORCE ##")
         best_time_from_file, initial_batches_from_file, task_prioritization_from_file = self.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
         
@@ -106,7 +106,7 @@ class Simulation:
             print("----- Iteration " + str(i + 1) + " -----")
             initial_batches = divide_into_random_sized_batches(AMOUNT_OF_WAFERS)
             
-            time = self.simulate(initial_batches, task_prioritization, False)
+            time = self.simulate(initial_batches, task_prioritization, timeout_between_adding_batches_to_start_buffer, False)
         
             if best_time is None or time < best_time:
                 best_time = time
@@ -121,7 +121,7 @@ class Simulation:
         print()
 
 
-    def try_all_task_prioritization(self, initial_batches):
+    def try_all_task_prioritization(self, initial_batches, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST TASK PRIORITIZATION BY TRYING ALL PERMUTATIONS ##")
         def combine_lists(lists, current_combination=[]):
             if not lists:
@@ -139,7 +139,7 @@ class Simulation:
         for i, r in enumerate(result):
             
             task_prioritization = [[r[0], r[1], r[2], r[3]], [r[4], r[5], r[6]], [r[7], r[8]]]
-            time = sim.simulate(initial_batches, task_prioritization, False)
+            time = sim.simulate(initial_batches, task_prioritization, timeout_between_adding_batches_to_start_buffer, False)
             print("Permutation number " + str(i) + ": " + str(task_prioritization) + ", time = " + str(time))
           
             
@@ -190,7 +190,7 @@ class Simulation:
 
             return time, initial_batches, task_order
         
-    def simulate(self, initial_batches, task_prioritization, print_simulation=True):
+    def simulate(self, initial_batches, task_prioritization, timeout_between_adding_batches_to_start_buffer, print_simulation=True):
         
         if print_simulation:
             print("## SIMULATING ONE CASE WITH PRINT ##")
@@ -199,11 +199,11 @@ class Simulation:
         current_time = 0
         load_unload_time = 1
         production_line = ProductionLine(task_prioritization)
-        
+        initial_batches = copy.deepcopy(initial_batches)
 
         # Add initial batches to start buffer
-        for batch in initial_batches:
-            production_line.start_buffer.add_batch(batch)
+        #for batch in initial_batches:
+        #    production_line.start_buffer.add_batch(batch)
 
         event_queue = []
 
@@ -212,17 +212,17 @@ class Simulation:
         total_size = 0
 
         # Start the simulation by adding a load event for the first unit that has the first task
-        event = Event(current_time + load_unload_time, "load", production_line.unit1)
+        #event = Event(current_time + load_unload_time, "load", production_line.unit1)
         # heappush works the same as append for a list
         # heappop works the same as pop(0) for a list
         # the different between a heapq and a list is that at any given time the first element is going to be the minimum element
         # the heapq is sorted on the attribute time
-        heapq.heappush(event_queue, event)
+        #heapq.heappush(event_queue, event)
 
 
-        #for i in range(len(initial_batches)):
-        #    event = Event(0, "load_to_start_buffer", None)
-        #    heapq.heappush(event_queue, event)
+        for i in range(len(initial_batches)):
+            event = Event(i + timeout_between_adding_batches_to_start_buffer, "load_to_start_buffer", None)
+            heapq.heappush(event_queue, event)
 #
 
         # we keep the simulation going as long as there is events in the event queue
@@ -255,19 +255,18 @@ class Simulation:
                     event = Event(current_time + load_unload_time, "load", unit)
                     heapq.heappush(event_queue, event)
             
-            #elif event.action == "load_to_start_buffer":
-            #    batch_to_be_popped = initial_batches[0]
-            #    print(batch_to_be_popped)
-            #    if production_line.start_buffer.add_batch(batch_to_be_popped):
-            #        print("JA")
-            #        initial_batches.pop(0)
-            #        for unit in production_line.units:
-            #            event = Event(current_time + load_unload_time, "load", unit)
-            #            heapq.heappush(event_queue, event)
-            #    else: 
-            #        print("IKKE")
-            #        event = Event(current_time + 1, "load_to_start_buffer", None)
-            #        heapq.heappush(event_queue, event)
+            elif event.action == "load_to_start_buffer":
+                batch_to_be_popped = initial_batches[0]
+                if production_line.start_buffer.add_batch(batch_to_be_popped):
+                    popped = initial_batches.pop(0)
+                    if print_simulation:
+                        print("tick:", current_time, "---", popped, "loaded to start buffer")
+                    for unit in production_line.units:
+                        event = Event(current_time + load_unload_time, "load", unit)
+                        heapq.heappush(event_queue, event)
+                else: 
+                    event = Event(current_time + timeout_between_adding_batches_to_start_buffer, "load_to_start_buffer", None)
+                    heapq.heappush(event_queue, event)
 #
 #
 
@@ -291,6 +290,7 @@ class Simulation:
                 print("All wafers confirmed in end buffer")
                 print("Total time:", current_time)
         else:
+            print(total_size)
             raise Exception("Not all wafers in end buffer")
         
         if print_simulation:
@@ -309,10 +309,10 @@ def main():
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
-    sim.simulate(initial_batches, task_prioritization, True)
-    sim.try_all_task_prioritization(initial_batches)
-    sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
+    sim.simulate(initial_batches, task_prioritization,  1, True)
+    sim.try_all_task_prioritization(initial_batches, 1)
+    sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization, 1)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization, 1)
 
 if __name__ == '__main__':
     main()

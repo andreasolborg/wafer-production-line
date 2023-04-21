@@ -5,7 +5,7 @@ from Unit import Unit
 
 class ProductionLine:
     def __init__(self, task_order):
-        self.start_buffer = Buffer(1, math.inf) # We assume the start buffer has infinite capacity
+        self.start_buffer = Buffer(1, 120) # We assume the start buffer has infinite capacity
         self.buffer2 = Buffer(2, 120)
         self.buffer3 = Buffer(3, 120)
         self.buffer4 = Buffer(4, 120)
