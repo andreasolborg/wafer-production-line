@@ -13,7 +13,7 @@ class Plot:
         for i in range(20,51):
             x_values.append(i)
             initital_batches = divide_into_most_equal_sized_batches(1000, i)
-            y_values.append(sim.simulate(initital_batches, task_prioritization, False))
+            y_values.append(sim.simulate(initital_batches, task_prioritization, 6,False))
 
         plt.plot(x_values, y_values)
         plt.xlabel("Average batch size")
@@ -23,7 +23,7 @@ class Plot:
 
     def plot_best_initial_batches(self):
         sim = Simulation()
-        time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
+        time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
         
         x_values = []
         y_values = []

@@ -10,18 +10,38 @@ import copy
 
 AMOUNT_OF_WAFERS = 1000
 class Simulation:
+
+    def try_to_find_best_timout_for_all_batchs_sizes(self, task_prioritization):
+        print("## FINDING BEST TIMEOUT FOR ALL BATCH SIZES ##")
+        
+        best_time = None
+        best_timeout = None
+        best_batch_size = None
+        for batch_size in range(20, 51):
+            initial_batches = divide_into_most_equal_sized_batches(AMOUNT_OF_WAFERS, batch_size)
+            timeout, time = self.try_to_find_new_best_timeout_between_batches(initial_batches, task_prioritization)
+            
+            print("Batch size:" + str(batch_size) + ", best timeout = " + str(timeout) + ", time = " + str(time))
+            if best_time is None or time < best_time:
+                best_time = time
+                best_timeout = timeout
+                best_batch_size = batch_size
+
+        
+        print("Best combination: Batch size:" + str(best_batch_size) + ", best timeout = " + str(best_timeout) + ", time = " + str(best_time))
     
     def try_to_find_new_best_timeout_between_batches(self, initial_batches, task_prioritization):
         best_time = None
         best_timeout = None
-        for i in range(1, 50):
+        for i in range(1, 300):
             time = self.simulate(initial_batches, task_prioritization, i, False)
-            print("Timeout between batches:" + str(i) + ", time = " + str(time))
+            #print("Timeout between batches:" + str(i) + ", time = " + str(time))
 
             if best_time is None or time < best_time:
                 best_time = time
                 best_timeout = i
-        print(best_timeout)
+        #print(best_timeout)
+        return best_timeout, best_time
 
     def try_to_find_new_best_initial_batches_with_genetic_algorithm(self, generations, task_prioritization, timeout_between_adding_batches_to_start_buffer):
         print("## FINDING BEST INITIAL BATCHES WITH GENETIC ALGORITHM ##")
@@ -321,14 +341,17 @@ def main():
     file = open("data/simulation.tsv", "w")
     file.close()
     
-    time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
-    #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
+    #time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
+    
+    initial_batches = divide_into_most_equal_sized_batches(1000, 20)
+    
+    task_prioritization = [[1, 3, 6, 9], [2, 5, 7], [4, 8]]
 
-    sim.simulate(initial_batches, task_prioritization,  timeout, True)
-    #sim.try_to_find_new_best_timeout_between_batches(initial_batches, task_prioritization)
-    #sim.try_all_task_prioritization(initial_batches, 50)
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization, 50)
-    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, timeout)
+    sim.simulate(initial_batches, task_prioritization, 6, True)
+    #sim.try_to_find_best_timout_for_all_batchs_sizes(task_prioritization)
+    #sim.try_all_task_prioritization(initial_batches, 20)
+    sim.try_to_find_new_best_initial_batches_with_bruteforce(1000, task_prioritization, 6)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, timeout)
 
 if __name__ == '__main__':
     main()

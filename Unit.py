@@ -6,12 +6,13 @@ class Unit:
         self.time_until_finished = 0
 
 
-    #def prior(self):
-    #    self.tasks = sorted(self.tasks, key=lambda task: task.inputbuffer.get_total_wafers(), reverse=True)
+    def prior(self):
+        self.tasks = sorted(self.tasks, key=lambda task: task.inputbuffer.get_total_wafers(), reverse=False)
+        
 
     def load(self, current_time, production_line, print_simulation):
         # Check if the unit is locked to a ongoing task
-        #self.prior()
+        self.prior()
         if current_time >= self.time_until_finished:
             return self.choose_next_task(current_time, print_simulation)
         # We return false if we dont find any task with something in the input buffer
