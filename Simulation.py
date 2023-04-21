@@ -310,9 +310,9 @@ def main():
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
     sim.simulate(initial_batches, task_prioritization, True)
-    # sim.try_all_task_prioritization(initial_batches)
-    # sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    # sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
+    sim.try_all_task_prioritization(initial_batches)
+    sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
+    sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
 
 if __name__ == '__main__':
     main()
