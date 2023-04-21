@@ -125,7 +125,7 @@ class Simulation:
         print("## FINDING BEST TASK PRIORITIZATION BY TRYING ALL PERMUTATIONS ##")
         def combine_lists(lists, current_combination=[]):
             if not lists:
-                yield current_combination
+                yield current_combination 
                 return
             for element in itertools.permutations(lists[0]):
                 yield from combine_lists(lists[1:], current_combination + list(element))
@@ -191,6 +191,7 @@ class Simulation:
             return time, initial_batches, task_order
         
     def simulate(self, initial_batches, task_prioritization, print_simulation=True):
+        
         if print_simulation:
             print("## SIMULATING ONE CASE WITH PRINT ##")
 
@@ -285,6 +286,8 @@ class Simulation:
         
         if total_size == AMOUNT_OF_WAFERS:
             if print_simulation:
+                with open("simulation.tsv", "a") as file:
+                    file.write(str(current_time) + "\tNone\tNone\tComplete\t"+str(current_time))
                 print("All wafers confirmed in end buffer")
                 print("Total time:", current_time)
         else:
@@ -298,15 +301,18 @@ class Simulation:
 def main():
     sim = Simulation()
     
-    task_prioritization = [[1, 3, 6, 9], [2, 5, 7], [4, 8]]
+    #clear simulation.tsv file
+    file = open("simulation.tsv", "w")
+    file.close()
+    
 
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
     sim.simulate(initial_batches, task_prioritization, True)
-    #sim.try_all_task_prioritization(initial_batches)
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
+    # sim.try_all_task_prioritization(initial_batches)
+    # sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
+    # sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
 
 if __name__ == '__main__':
     main()
