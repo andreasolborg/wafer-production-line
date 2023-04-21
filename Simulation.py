@@ -316,6 +316,9 @@ class Simulation:
             ax.set_yticks(yticks)
             plt.xticks(fontsize=10)
             plt.yticks(fontsize=10)
+            plt.title('How many wafers is finished at different times')
+            plt.ylabel('Wafer')
+            plt.xlabel('Time')
             plt.show()
             plt.close()
         
@@ -341,17 +344,17 @@ def main():
     file = open("data/simulation.tsv", "w")
     file.close()
     
-    #time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
+    time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
     
-    initial_batches = divide_into_most_equal_sized_batches(1000, 20)
+    #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
     
     task_prioritization = [[1, 3, 6, 9], [2, 5, 7], [4, 8]]
 
     sim.simulate(initial_batches, task_prioritization, 6, True)
     #sim.try_to_find_best_timout_for_all_batchs_sizes(task_prioritization)
     #sim.try_all_task_prioritization(initial_batches, 20)
-    sim.try_to_find_new_best_initial_batches_with_bruteforce(1000, task_prioritization, 6)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, timeout)
+    #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000, task_prioritization, 6)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, 6)
 
 if __name__ == '__main__':
     main()
