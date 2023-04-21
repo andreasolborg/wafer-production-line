@@ -1,3 +1,4 @@
+# Group 4 - Assignment 3 - Authors: Jon Grendstad, Andreas Blokkum Olborg - TPK4186
 import random
 class Batch:
     def __init__(self, id, size):

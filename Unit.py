@@ -1,3 +1,4 @@
+# Group 4 - Assignment 3 - Authors: Jon Grendstad, Andreas Blokkum Olborg - TPK4186
 class Unit:
     def __init__(self, id, tasks):
         self.id = id

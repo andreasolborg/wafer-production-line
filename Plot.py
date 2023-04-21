@@ -1,9 +1,9 @@
+# Group 4 - Assignment 3 - Authors: Jon Grendstad, Andreas Blokkum Olborg - TPK4186
 import matplotlib.pyplot as plt
 from Simulation import Simulation
 from Batch import divide_into_most_equal_sized_batches
 
 class Plot:
-
     def plot_divide_into_most_equal_sized_batches(self):
         sim = Simulation()
         task_prioritization = [[1, 3, 6, 9], [5, 7, 2], [4, 8]] 

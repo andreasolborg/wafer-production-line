@@ -1,3 +1,4 @@
+# Group 4 - Assignment 3 - Authors: Jon Grendstad, Andreas Blokkum Olborg
 import heapq
 from Batch import Batch, divide_into_most_equal_sized_batches, divide_into_random_sized_batches
 from ProductionLine import ProductionLine

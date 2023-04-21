@@ -1,4 +1,5 @@
-import math
+# Group 4 - Assignment 3 - Authors: Jon Grendstad, Andreas Blokkum Olborg - TPK4186
+import math 
 import copy
 class Task:
     def __init__(self, id, time_per_wafer, inputbuffer, outputbuffer):
@@ -36,7 +37,7 @@ class Task:
         if self.active_batch: 
             time_until_finished = math.ceil((self.active_batch.size * self.time_per_wafer + current_time) * 10) / 10
             if print_simulation:
-                print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
+                print("tick:", current_time, "---", self, "Batch", self.active_batch, "loaded and finishes at", time_until_finished)
                 self.write_to_file(current_time, time_until_finished, action="load")
             return time_until_finished
         
@@ -47,7 +48,7 @@ class Task:
             if self.outputbuffer.add_batch(self.active_batch):
                 
                 if print_simulation:
-                    print("tick:", current_time, "---", self, self.active_batch, "unloaded")
+                    print("tick:", current_time, "---", self, "Batch", self.active_batch, "unloaded")
                     self.write_to_file(current_time, None, action="unload")
                 
                 active_batch_copy = copy.copy(self.active_batch)
