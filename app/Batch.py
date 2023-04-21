@@ -8,7 +8,7 @@ class Batch:
         return {"id": self.id, "size": self.size}
     
     def __str__(self):
-        return "batch" + str(self.id)
+        return str(self.id)
     
 def divide_into_most_equal_sized_batches(total, batch_size):
     if batch_size < 20:

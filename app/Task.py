@@ -6,8 +6,28 @@ class Task:
         self.time_per_wafer = time_per_wafer
         self.inputbuffer = inputbuffer
         self.outputbuffer = outputbuffer
-
         self.active_batch = None
+
+
+    def write_to_file(self, current_time, time_until_finished=None, action=None):
+        with open("simulation.tsv", "a") as file:
+            if file.tell() == 0:  # Check if file is empty
+                # Write header
+                file.write("Tick\tTask\tBatch\tAction\tFinish Time\tOutputbuffer Size\n")
+            if action == "load":
+                # If output buffer has no content and does not have infinite capacity, 
+                if not self.outputbuffer.content or self.outputbuffer.capacity == math.inf:
+                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tLOADED\t{time_until_finished:.1f}\n"
+                elif self.outputbuffer.capacity != math.inf:
+                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tLOADED\t{time_until_finished:.1f}\t{self.outputbuffer.get_total_wafers()}\n"
+            elif action == "unload":
+                if not self.outputbuffer.content or self.outputbuffer.capacity == math.inf:
+                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tUNLOADED\n"
+                elif self.outputbuffer.capacity != math.inf:
+                    line = f"{current_time:.1f}\t{self}\t{self.active_batch}\tUNLOADED\t{self.outputbuffer.get_total_wafers()}\n"
+            file.write(line)
+
+
 
     def load(self, current_time, print_simulation):
         # A batch must be unloaded immidiatly after its processed so we must ensure its room in the outputbuffer when we unload it
@@ -23,6 +43,7 @@ class Task:
             time_until_finished = math.ceil((self.active_batch.size * self.time_per_wafer + current_time) * 10) / 10
             if print_simulation:
                 print("tick:", current_time, "---", self, self.active_batch, "loaded and finishes at", time_until_finished)
+                self.write_to_file(current_time, time_until_finished, action="load")
             return time_until_finished
         
         return False  
@@ -33,6 +54,7 @@ class Task:
                 
                 if print_simulation:
                     print("tick:", current_time, "---", self, self.active_batch, "unloaded")
+                    self.write_to_file(current_time, None, action="unload")
                 
                 active_batch_copy = copy.copy(self.active_batch)
                 self.active_batch = None
@@ -58,4 +80,4 @@ class Task:
         return False
 
     def __str__(self):
-        return "task" + str(self.id)
+        return "Task " + str(self.id)

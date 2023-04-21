@@ -19,14 +19,14 @@ class Simulation:
         initial_population = []
         
         # We want to take all our best initial batches and add them to the population
-        #all_initial_batches_from_file = self.get_all_initial_batches_from_csv_file("data/best_initial_batches.csv")
+        all_initial_batches_from_file = self.get_all_initial_batches_from_csv_file("data/best_initial_batches.csv")
         
         # We create 400 random initial batches and add them to the population
         for _ in range(500):
             initial_population.append(divide_into_random_sized_batches(AMOUNT_OF_WAFERS))
         
         
-        #initial_population.extend(all_initial_batches_from_file)
+        initial_population.extend(all_initial_batches_from_file)
 
         for i in range(generations):
             print("----- Generation " + str(i + 1), "-----")
@@ -125,7 +125,7 @@ class Simulation:
         print("## FINDING BEST TASK PRIORITIZATION BY TRYING ALL PERMUTATIONS ##")
         def combine_lists(lists, current_combination=[]):
             if not lists:
-                yield current_combination
+                yield current_combination 
                 return
             for element in itertools.permutations(lists[0]):
                 yield from combine_lists(lists[1:], current_combination + list(element))
@@ -169,7 +169,7 @@ class Simulation:
             for row in rows:
                 initial_batches = []
                 for i in range(10, len(row)):
-                    initial_batches.append(Batch(i, int(row[i])))
+                    initial_batches.append(Batch(i-9, int(row[i])))
                 all_initial_batches.append(initial_batches)
 
             return all_initial_batches
@@ -186,11 +186,12 @@ class Simulation:
             time = float(last_row[9])
             task_order = [[int(last_row[0]), int(last_row[1]), int(last_row[2]), int(last_row[3])], [int(last_row[4]), int(last_row[5]), int(last_row[6])], [int(last_row[7]), int(last_row[8])]]
             for i in range(10, len(last_row)):
-                initial_batches.append(Batch(i, int(last_row[i])))
+                initial_batches.append(Batch(i-9, int(last_row[i])))
 
             return time, initial_batches, task_order
         
     def simulate(self, initial_batches, task_prioritization, print_simulation=True):
+        
         if print_simulation:
             print("## SIMULATING ONE CASE WITH PRINT ##")
 
@@ -261,6 +262,8 @@ class Simulation:
         
         if total_size == AMOUNT_OF_WAFERS:
             if print_simulation:
+                with open("simulation.tsv", "a") as file:
+                    file.write(str(current_time) + "\tNone\tNone\tComplete\t"+str(current_time))
                 print("All wafers confirmed in end buffer")
                 print("Total time:", current_time)
         else:
@@ -274,15 +277,18 @@ class Simulation:
 def main():
     sim = Simulation()
     
+    #clear simulation.tsv file
+    file = open("simulation.tsv", "w")
+    file.close()
     
 
     time, initial_batches, task_prioritization = sim.get_best_initial_batches_with_time_and_task_prioritization_from_csv_file("data/best_initial_batches.csv")
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
 
     sim.simulate(initial_batches, task_prioritization, True)
-    #sim.try_all_task_prioritization(initial_batches)
-    #sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(100, task_prioritization)
+    # sim.try_all_task_prioritization(initial_batches)
+    # sim.try_to_find_new_best_initial_batches_with_bruteforce(100, task_prioritization)
+    # sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(3, task_prioritization)
 
 if __name__ == '__main__':
     main()

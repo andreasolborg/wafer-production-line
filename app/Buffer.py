@@ -21,4 +21,7 @@ class Buffer:
     def __str__(self):
         return "buffer" + str(self.id)
     
+    def content_to_string(self):
+        return ", ".join(str(batch) for batch in self.content)
+    
 
