@@ -212,7 +212,7 @@ class Simulation:
             reader = csv.reader(file)
             rows = list(reader)
             if len(rows) == 0:
-                return 999999999, None
+                return 999999999, None, None, None
             
             last_row = rows[-1]
             initial_batches = []
@@ -345,17 +345,18 @@ def main():
     file = open("data/simulation.tsv", "w")
     file.close()
     
+    # It dosent matter what task prioritization is saved in the file because we change it dynamically every time we load a new task in a unit
     time, initial_batches, task_prioritization, timeout = sim.get_best_initial_batches_with_time_and_task_prioritization_and_timeout_from_csv_file("data/best_initial_batches.csv")
     
     #initial_batches = divide_into_most_equal_sized_batches(1000, 20)
-    
-    task_prioritization = [[1, 3, 6, 9], [2, 5, 7], [4, 8]]
+    #task_prioritization = [[1, 3, 6, 9], [2, 5, 7], [4, 8]]
 
     sim.simulate(initial_batches, task_prioritization, 6, True)
+    
     #sim.try_to_find_best_timout_for_all_batchs_sizes(task_prioritization)
     #sim.try_all_task_prioritization(initial_batches, 20)
     #sim.try_to_find_new_best_initial_batches_with_bruteforce(1000, task_prioritization, 6)
-    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(20, task_prioritization, 6)
+    #sim.try_to_find_new_best_initial_batches_with_genetic_algorithm(4, task_prioritization, 6)
 
 if __name__ == '__main__':
     main()
