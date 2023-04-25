@@ -89,4 +89,4 @@ Our simulate function takes in the following parameters: initial_batches (the 10
 The simulation is written to a tsv file, and works by writing a line everytime an Action/Event is triggered on a Task object. The file is called simulation.tsv and is located in the data folder.
 
 ## Task 5, 6, 7
-See the report for the results of the optimization.
+See the report for the results of the optimization. It is in the documentation folder.
